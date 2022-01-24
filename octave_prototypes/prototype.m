@@ -1,0 +1,20 @@
+sim_in.coherent_demod = 0;
+sim_in.nsym = 10;
+sim_in.EbNodB = 10;
+sim_in.verbose = 2;
+nsym =  sim_in.nsym;
+EbNodB = sim_in.EbNodB;
+verbose = sim_in.verbose;
+Rs = 4800;
+gmsk_states.verbose = verbose;
+gmsk_states.coherent_demod = sim_in.coherent_demod;
+gmsk_states.phase_track = 0;
+gmsk_states = gmsk_init(gmsk_states, Rs);
+fm_states.pre_emp=1;
+tx_bits = round(rand(1, nsym));
+%tx_bits = ones(1, nsym);
+%tx_bits = zeros(1, nsym);
+%tx_bits(1:2:nsym) = 0;
+[tx, tx_filt, tx_symbols] = gmsk_mod(gmsk_states, tx_bits);
+plot(tx_symbols)
+nsam = length(tx);
