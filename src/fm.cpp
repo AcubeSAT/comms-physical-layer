@@ -1,7 +1,7 @@
 #include "fm.h"
-#include "filter.h"
 #include <algorithm>
 #include <math.h>
+#include "filter.h"
 
 void FMTranscoder::modulate(const double *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal){
     // Check if pre-emphasis is applied to the signal
@@ -21,7 +21,12 @@ void FMTranscoder::modulate(const double *signal, uint16_t signal_length, double
     double tx_curr = 0;
     double tx_next = 0;
     for (uint16_t i = 0; i < signal_length; i++){
-        step = central_component + frequency_deviation_component*in_phase_signal[i];
+        // TODO: More efficient way
+        if (predeEmphasis) {
+            step = central_component + frequency_deviation_component * in_phase_signal[i];
+        } else{
+            step = central_component + frequency_deviation_component * signal[i];
+        }
         phase += step;
         phase -= floor(phase/(2*M_PI))*2*M_PI;
         in_phase_signal[i] = cos(phase);

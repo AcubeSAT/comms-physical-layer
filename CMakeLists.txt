@@ -11,4 +11,5 @@ add_executable(tc_synchronization
         inc/gmsk.h
         src/fm.cpp
         src/gmsk.cpp
-        src/main.cpp)
+        src/main.cpp
+        src/filter.cpp)
