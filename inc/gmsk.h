@@ -27,6 +27,10 @@ public:
 
     // TODO: signal_length should be a pre-determined number
     void modulate(const double *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal);
+
+    // Consider changing input IQ signal to const
+    void
+    demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length, bool *signal);
 };
 
 #endif //TC_SYNCHRONIZATION_GMSK_H

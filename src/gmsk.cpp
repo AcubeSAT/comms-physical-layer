@@ -1,5 +1,6 @@
 #include <gmsk.h>
 #include <iostream>
+#include <cstring>
 #include "filter.h"
 
 double gmsk_mod_coeff[] = {
@@ -64,13 +65,15 @@ void GMSKTranscoder::modulate(const double *signal, uint16_t signal_length, doub
 
     filter_fir(gmsk_mod_coeff, s, internal_buffer, samples_n, internal_buffer2);
     fm_transcoder.modulate(internal_buffer2, samples_n, in_phase_signal, quadrature_signal);
+}
 
-    for (int i = 0; i < samples_n; i++) {
-        std::cout << in_phase_signal[i] << " ";
-    }
-    std::cout << std::endl;
-    for (int i = 0; i < samples_n; i++) {
-        std::cout << quadrature_signal[i] << " ";
-    }
+void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length,
+                                bool *signal) {
+    uint16_t symbols_n = floor(signal_length / samples_per_symbol);
+    float frequency_deviation_component = 2 * M_PI * max_deviation / sampling_frequency;
+    double timing_angle_log[2 << 12] = {0};
+    double rx_int[2 << 12] = {0};
 
+    filter_fir(gmsk_demod_coef, 103, input_in_phase_signal, signal_length, internal_buffer);
+    filter_fir(gmsk_demod_coef, 103, input_quadrature_signal, signal_length, internal_buffer2);
 }
