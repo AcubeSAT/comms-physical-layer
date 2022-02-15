@@ -1,6 +1,8 @@
 #ifndef TC_SYNCHRONIZATION_GMSK_H
 #define TC_SYNCHRONIZATION_GMSK_H
 
+#include <cstdint>
+
 double gmsk_mod_coeff[] = {
     6.455906007234699e-014, 1.037067381285011e-012, 1.444835156335346e-011,
     1.745786683011439e-010, 1.829471305298363e-009, 1.662729407135958e-008,
@@ -14,7 +16,7 @@ double gmsk_mod_coeff[] = {
     4.598383433830090e-003, 1.580581180127420e-003, 4.711833994209542e-004,
     1.218217140199093e-004, 2.731624380156465e-005, 5.312253663302753e-006,
     8.959797186410563e-007, 1.310626978701910e-007, 1.662729407135958e-008,
-    1.829471305298363e-009, 1.745786683011426e-010, 1.444835156335356e-011,.
+    1.829471305298363e-009, 1.745786683011426e-010, 1.444835156335356e-011,
     1.037067381285011e-012, 6.455906007234699e-014};
 
 double gmsk_demod_coef[] = {
@@ -59,5 +61,6 @@ class GMSKTranscoder{
             max_frequency = sampling_frequency/2;
     }
     void modulate(const double *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal);
-}
+};
+
 #endif //TC_SYNCHRONIZATION_GMSK_H
