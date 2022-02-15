@@ -1,21 +1,23 @@
 #include "filter.h"
 
-void filter_fir(const double* filter_taps, uint16_t number_of_taps, const double* input_signal, uint16_t size, double* output_signal){
+void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double *input_signal, uint16_t size,
+                double *output_signal) {
     // TODO: Naive implementation for testing purposes only! If this is mean to be run also on ground, replace with a
     //  well-known library or at least a more efficient, vectorised implementation. Otherwise, fall back to
     //  architecture-specific libraries. Additionally, if the latter is the case, an additional parameter needs to be
     //  passed both here and in the initialization of the modems that defines which implementation is to be chosen
-    for (uint16_t n = 0; n < size; n++){
+    for (uint16_t n = 0; n < size; n++) {
         output_signal[n] = 0;
-        for (uint16_t k = 0; k < std::fmin(n+1, number_of_taps); k++) {
-            output_signal[n] += filter_taps[k]*input_signal[n-k];
+        for (uint16_t k = 0; k < std::fmin(n + 1, number_of_taps); k++) {
+            output_signal[n] += filter_taps[k] * input_signal[n - k];
             output_signal[n];
         }
     }
 }
-void multiply_vec(double* signal, uint16_t length, double coef){
+
+void multiply_vec(double *signal, uint16_t length, double coef) {
     // TODO: This is a placeholder bad implementation. Replace with HAL function (interface may need to change slightly)
-    for (int i = 0; i < length; i++){
-        signal[i]*=coef;
+    for (int i = 0; i < length; i++) {
+        signal[i] *= coef;
     }
 }

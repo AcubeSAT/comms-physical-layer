@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-class FMTranscoder{
+class FMTranscoder {
 private:
     uint32_t samplingFrequency;
     uint32_t maxModulatingFrequency;
@@ -23,16 +23,23 @@ public:
      * @param pre_de_emphasis   Defines whether pre- and de-emphasis filters of high frequencies is applied
      */
     FMTranscoder(uint32_t sampling_frequency, uint32_t max_modulating_frequency, uint32_t baseband_frequency,
-                 uint16_t max_deviation, bool pre_de_emphasis, bool limit_delta_phase): samplingFrequency(sampling_frequency),
-                 maxModulatingFrequency(max_modulating_frequency), maxDeviation(max_deviation),
-                 predeEmphasis(pre_de_emphasis), basebandFrequency(baseband_frequency), limitDeltaPhase(limit_delta_phase){
+                 uint16_t max_deviation, bool pre_de_emphasis, bool limit_delta_phase) : samplingFrequency(
+            sampling_frequency),
+                                                                                         maxModulatingFrequency(
+                                                                                                 max_modulating_frequency),
+                                                                                         maxDeviation(max_deviation),
+                                                                                         predeEmphasis(pre_de_emphasis),
+                                                                                         basebandFrequency(
+                                                                                                 baseband_frequency),
+                                                                                         limitDeltaPhase(
+                                                                                                 limit_delta_phase) {
         // Estimate bandwidth using Carlson's rule
-        bandwidth = 2*(maxModulatingFrequency + maxDeviation);
+        bandwidth = 2 * (maxModulatingFrequency + maxDeviation);
 
         // Initialize pre-emphasis filter taps
         pre_emphasis_filter[0] = 1.0;
         const double time_const_cutoff = 50e-6; // τ = 50µs in Europe
-        pre_emphasis_filter[1] = -(1.0 - 1.0/(time_const_cutoff*sampling_frequency));
+        pre_emphasis_filter[1] = -(1.0 - 1.0 / (time_const_cutoff * sampling_frequency));
         centralFrequency = (2.0 * maxModulatingFrequency) / samplingFrequency;
     };
 

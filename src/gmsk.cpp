@@ -47,28 +47,30 @@ double gmsk_demod_coef[] = {
         0.000167227768379, 0.000000000000000, -0.000153959924563
 };
 
-void GMSKTranscoder::modulate(const double *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal){
+void GMSKTranscoder::modulate(const double *signal, uint16_t signal_length, double *in_phase_signal,
+                              double *quadrature_signal) {
     uint16_t samples_n = samples_per_symbol * signal_length;
 
-    for (uint16_t i = 0; i < signal_length; i++){
+    for (uint16_t i = 0; i < signal_length; i++) {
         // TODO: HAL implementation
-        for (uint16_t j = 0; j < samples_per_symbol; j++){
-            internal_buffer[i*samples_per_symbol + j] = -1 + 2*(signal[i]);
+        for (uint16_t j = 0; j < samples_per_symbol; j++) {
+            internal_buffer[i * samples_per_symbol + j] = -1 + 2 * (signal[i]);
         }
     }
     uint16_t s = 41;
 
-    void filter_fir(const double* filter_taps, uint16_t number_of_taps, const double* input_signal, uint16_t size, double* output_signal);
+    void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double *input_signal, uint16_t size,
+                    double *output_signal);
 
     filter_fir(gmsk_mod_coeff, s, internal_buffer, samples_n, internal_buffer2);
     fm_transcoder.modulate(internal_buffer2, samples_n, in_phase_signal, quadrature_signal);
 
-    for (int i = 0; i < samples_n; i++){
-        std::cout << in_phase_signal[i] <<" ";
+    for (int i = 0; i < samples_n; i++) {
+        std::cout << in_phase_signal[i] << " ";
     }
     std::cout << std::endl;
-    for (int i = 0; i < samples_n; i++){
-        std::cout << quadrature_signal[i] <<" ";
+    for (int i = 0; i < samples_n; i++) {
+        std::cout << quadrature_signal[i] << " ";
     }
 
 }
