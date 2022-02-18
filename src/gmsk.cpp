@@ -19,7 +19,7 @@ double gmsk_mod_coeff[] = {
         1.829471305298363e-009, 1.745786683011426e-010, 1.444835156335356e-011,
         1.037067381285011e-012, 6.455906007234699e-014};
 
-double gmsk_demod_coef[] = {
+double gmsk_demod_coeff[] = {
         -0.000153959924563, 0.000000000000000, 0.000167227768379, 0.000341615513437,
         0.000513334449696, 0.000667493753523, 0.000783901543032, 0.000838293462576,
         0.000805143268199, 0.000661865814384, 0.000393913058926, -0.000000000000000,
@@ -52,6 +52,7 @@ void GMSKTranscoder::modulate(const double *signal, uint16_t signal_length, doub
                               double *quadrature_signal) {
     uint16_t samples_n = samples_per_symbol * signal_length;
 
+    // NRZ encoding
     for (uint16_t i = 0; i < signal_length; i++) {
         // TODO: HAL implementation
         for (uint16_t j = 0; j < samples_per_symbol; j++) {
@@ -63,7 +64,10 @@ void GMSKTranscoder::modulate(const double *signal, uint16_t signal_length, doub
     void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double *input_signal, uint16_t size,
                     double *output_signal);
 
+    // Filter matching
     filter_fir(gmsk_mod_coeff, s, internal_buffer, samples_n, internal_buffer2);
+
+    // FM Modulator
     fm_transcoder.modulate(internal_buffer2, samples_n, in_phase_signal, quadrature_signal);
 }
 
@@ -71,9 +75,54 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
                                 bool *signal) {
     uint16_t symbols_n = floor(signal_length / samples_per_symbol);
     float frequency_deviation_component = 2 * M_PI * max_deviation / sampling_frequency;
-    double timing_angle_log[2 << 12] = {0};
     double rx_int[2 << 12] = {0};
 
-    filter_fir(gmsk_demod_coef, 103, input_in_phase_signal, signal_length, internal_buffer);
-    filter_fir(gmsk_demod_coef, 103, input_quadrature_signal, signal_length, internal_buffer2);
+    //for (int i = 0; i < signal_length; i++){
+    //   std::cout << input_quadrature_signal[i] << " ";
+    // }
+
+    filter_fir(gmsk_mod_coeff, 103, input_in_phase_signal, signal_length, internal_buffer);
+    filter_fir(gmsk_mod_coeff, 103, input_quadrature_signal, signal_length, internal_buffer2);
+
+    integrate(internal_buffer, signal_length, 2*samples_per_symbol, input_in_phase_signal);
+    integrate(internal_buffer2, signal_length, 2*samples_per_symbol, input_quadrature_signal);
+
+    // Implement PLL
+    double dco = 0;
+    double lower = 0;
+    double loop_filt = 0;
+    double phase_error = 0;
+    double timing_clock_phase = 0;
+    uint16_t timing_window = 5*samples_per_symbol; // TODO: 200*samples_per_symbol;
+    double timing_angle = 0;
+    double* timing_angle_log = internal_buffer;
+
+    double temp;
+
+    for (uint16_t i; i < signal_length; i++){
+        if (i > 1 && (i+1) % timing_window == 0){
+            double i_clock_phase = 0;
+            double q_clock_phase = 0;
+            for (uint16_t j = i - timing_window + 1; j < i; j++){
+                i_clock_phase += fabs(input_in_phase_signal[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+                std::cout << fabs(input_in_phase_signal[j]) << " ";
+                q_clock_phase += fabs(input_in_phase_signal[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+            }
+            std::cout << std::endl;
+            timing_angle = atan2(q_clock_phase, i_clock_phase);
+            timing_clock_phase = timing_angle;
+        } else{
+            timing_clock_phase += 2.0*M_PI/(2*samples_per_symbol);
+        }
+        timing_angle_log[i] = timing_angle;
+
+        temp = input_in_phase_signal[i]*cos(dco) - input_quadrature_signal[i]*sin(dco);
+        input_quadrature_signal[i] = input_in_phase_signal[i]*sin(dco) + cos(dco)*input_quadrature_signal[i];
+
+        input_in_phase_signal[i] = temp;
+        phase_error = (-1+2*signs(input_in_phase_signal[i]*input_quadrature_signal[i]))*cos(timing_clock_phase);
+        lower = pll_params.G2*phase_error + lower;
+        loop_filt = pll_params.G1*phase_error + lower;
+        dco = dco + loop_filt;
+    }
 }

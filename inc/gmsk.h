@@ -3,6 +3,16 @@
 #pragma once
 
 #include <fm.h>
+#include <cmath>
+#include <iostream>
+
+struct PLLParameters{
+    double damping_ratio;
+    double natural_frequency;
+    double symbol_time;
+    double G1; // Gain of the upper branch of the loop filter
+    double G2; // Gain of the lower branch of the loop filter
+};
 
 class GMSKTranscoder {
 private:
@@ -12,17 +22,32 @@ private:
     uint32_t sampling_rate;
     uint32_t samples_per_symbol;
     uint32_t max_frequency;
+    uint32_t symbol_rate;
     uint32_t max_deviation;
     FMTranscoder fm_transcoder;
+    PLLParameters pll_params;
 
 public:
-    GMSKTranscoder(uint32_t sampling_frequency, uint32_t symbol_rate) :
-            fm_transcoder(FMTranscoder(sampling_frequency, symbol_rate / 2, 0,
-                                       symbol_rate / 4, 0, 0)) {
-        samples_per_symbol = sampling_frequency / symbol_rate;
+    GMSKTranscoder(uint32_t sample_frequency, uint32_t symb_rate) :
+            fm_transcoder(FMTranscoder(sample_frequency, symb_rate / 2, 0,
+                                       symb_rate / 4, 0, 0)),
+                                       symbol_rate(symb_rate), sampling_frequency(sample_frequency) {
+        samples_per_symbol = sample_frequency / symbol_rate;
         max_frequency = symbol_rate / 2;
         max_deviation = symbol_rate / 4;
 
+        double zeta = 0.707;
+        double wn = (2.0*10*M_PI*symbol_rate)/4800;
+        double an = exp(-zeta*wn/sampling_frequency);
+        double g1 = 1 - an*an;
+        double g2 = 1 + an*an - 2*an* cos(wn*sqrt(1-zeta*zeta)/sampling_frequency);
+
+        pll_params = {zeta,
+                                    wn,
+                                    1.0/sampling_frequency,
+                                    g1*M_PI/2,
+                                    g2*M_PI/2
+                                    };
     }
 
     // TODO: signal_length should be a pre-determined number

@@ -10,7 +10,17 @@ void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double
         output_signal[n] = 0;
         for (uint16_t k = 0; k < std::fmin(n + 1, number_of_taps); k++) {
             output_signal[n] += filter_taps[k] * input_signal[n - k];
-            output_signal[n];
+        }
+    }
+}
+
+// TODO: Instead of O(nk) this can easily be simplified to O(n) by considering the sliding window and at the time step
+//  t adding x(t) while subtracting x(t-k). See if there is a HAL implementation for this (ideally don't use convolve).
+void integrate(const double *input_signal, uint16_t size, uint16_t number_of_taps, double *output_signal){
+    for (uint16_t n = 0; n < size; n++) {
+        output_signal[n] = 0;
+        for (uint16_t k = 0; k < std::fmin(n + 1, number_of_taps); k++) {
+            output_signal[n] += input_signal[n - k];
         }
     }
 }

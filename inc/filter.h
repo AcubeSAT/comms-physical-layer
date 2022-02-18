@@ -11,6 +11,12 @@
 void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double *input_signal, uint16_t size,
                 double *output_signal);
 
+void integrate(const double *input_signal, uint16_t size, uint16_t number_of_taps, double *output_signal);
+
 void multiply_vec(double *signal, uint16_t length, double coef);
+
+inline bool signs(double x){
+    return x > 0;
+}
 
 #endif //TC_SYNCHRONIZATION_FILTER_H
