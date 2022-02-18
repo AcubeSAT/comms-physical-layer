@@ -103,12 +103,10 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
         if (i > 1 && (i+1) % timing_window == 0){
             double i_clock_phase = 0;
             double q_clock_phase = 0;
-            for (uint16_t j = i - timing_window + 1; j < i; j++){
+            for (uint16_t j = i - timing_window + 1; j <= i; j++){
                 i_clock_phase += fabs(input_in_phase_signal[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
-                std::cout << fabs(input_in_phase_signal[j]) << " ";
-                q_clock_phase += fabs(input_in_phase_signal[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+                q_clock_phase -= fabs(input_in_phase_signal[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
             }
-            std::cout << std::endl;
             timing_angle = atan2(q_clock_phase, i_clock_phase);
             timing_clock_phase = timing_angle;
         } else{
