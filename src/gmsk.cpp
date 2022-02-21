@@ -77,12 +77,13 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     float frequency_deviation_component = 2 * M_PI * max_deviation / sampling_frequency;
     double rx_int[2 << 12] = {0};
 
-    //for (int i = 0; i < signal_length; i++){
-    //   std::cout << input_quadrature_signal[i] << " ";
-    // }
+    filter_fir(gmsk_mod_coeff, 29, input_in_phase_signal, signal_length, internal_buffer);
+    filter_fir(gmsk_mod_coeff, 29, input_quadrature_signal, signal_length, internal_buffer2);
 
-    filter_fir(gmsk_mod_coeff, 103, input_in_phase_signal, signal_length, internal_buffer);
-    filter_fir(gmsk_mod_coeff, 103, input_quadrature_signal, signal_length, internal_buffer2);
+    for (int i = 0; i < signal_length; i++){
+        std::cout << internal_buffer[i] << " ";
+    }
+    std::cout << std::endl;
 
     integrate(internal_buffer, signal_length, 2*samples_per_symbol, input_in_phase_signal);
     integrate(internal_buffer2, signal_length, 2*samples_per_symbol, input_quadrature_signal);
@@ -93,7 +94,7 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     double loop_filt = 0;
     double phase_error = 0;
     double timing_clock_phase = 0;
-    uint16_t timing_window = 5*samples_per_symbol; // TODO: 200*samples_per_symbol;
+    uint16_t timing_window = 10*samples_per_symbol; // TODO: 200*samples_per_symbol;
     double timing_angle = 0;
     double* timing_angle_log = internal_buffer;
 
@@ -106,7 +107,7 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
             for (uint16_t j = i - timing_window + 1; j <= i; j++){
                 i_clock_phase += fabs(input_in_phase_signal[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
                 q_clock_phase -= fabs(input_in_phase_signal[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
-            }
+                }
             timing_angle = atan2(q_clock_phase, i_clock_phase);
             timing_clock_phase = timing_angle;
         } else{
@@ -114,13 +115,13 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
         }
         timing_angle_log[i] = timing_angle;
 
-        temp = input_in_phase_signal[i]*cos(dco) - input_quadrature_signal[i]*sin(dco);
-        input_quadrature_signal[i] = input_in_phase_signal[i]*sin(dco) + cos(dco)*input_quadrature_signal[i];
-
+        temp = input_in_phase_signal[i]*cos(dco) + input_quadrature_signal[i]*sin(dco);
+        input_quadrature_signal[i] = -input_in_phase_signal[i]*sin(dco) + cos(dco)*input_quadrature_signal[i];
         input_in_phase_signal[i] = temp;
         phase_error = (-1+2*signs(input_in_phase_signal[i]*input_quadrature_signal[i]))*cos(timing_clock_phase);
         lower = pll_params.G2*phase_error + lower;
         loop_filt = pll_params.G1*phase_error + lower;
         dco = dco + loop_filt;
     }
+    std::cout << std::endl << timing_angle << std::endl;
 }
