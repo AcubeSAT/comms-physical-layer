@@ -48,7 +48,7 @@ double gmsk_demod_coeff[] = {
         0.000167227768379, 0.000000000000000, -0.000153959924563
 };
 
-void GMSKTranscoder::modulate(const double *signal, uint16_t signal_length, double *in_phase_signal,
+void GMSKTranscoder::modulate(int8_t *signal, uint16_t signal_length, double *in_phase_signal,
                               double *quadrature_signal) {
     uint16_t samples_n = samples_per_symbol * signal_length;
 
@@ -59,31 +59,35 @@ void GMSKTranscoder::modulate(const double *signal, uint16_t signal_length, doub
             internal_buffer[i * samples_per_symbol + j] = -1 + 2 * (signal[i]);
         }
     }
+    // Precoding
+    int8_t tmp1 = internal_buffer[0];
+    int8_t tmp2;
+    for (uint16_t i = 1; i < signal_length; i++){
+        tmp2 = internal_buffer[i];
+        internal_buffer2[i] = internal_buffer[i]* tmp1 * (-1 + 2*(i%2==0));
+        tmp1 = tmp2;
+    }
     uint16_t s = 41;
 
     void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double *input_signal, uint16_t size,
                     double *output_signal);
 
     // Filter matching
-    filter_fir(gmsk_mod_coeff, s, internal_buffer, samples_n, internal_buffer2);
+    filter_fir(gmsk_mod_coeff, s, internal_buffer2, samples_n, internal_buffer);
 
     // FM Modulator
-    fm_transcoder.modulate(internal_buffer2, samples_n, in_phase_signal, quadrature_signal);
+    fm_transcoder.modulate(internal_buffer, samples_n, in_phase_signal, quadrature_signal);
 }
 
 void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length,
                                 bool *signal) {
+
     uint16_t symbols_n = floor(signal_length / samples_per_symbol);
     float frequency_deviation_component = 2 * M_PI * max_deviation / sampling_frequency;
     double rx_int[2 << 12] = {0};
 
     filter_fir(gmsk_mod_coeff, 29, input_in_phase_signal, signal_length, internal_buffer);
     filter_fir(gmsk_mod_coeff, 29, input_quadrature_signal, signal_length, internal_buffer2);
-
-    for (int i = 0; i < signal_length; i++){
-        std::cout << internal_buffer[i] << " ";
-    }
-    std::cout << std::endl;
 
     integrate(internal_buffer, signal_length, 2*samples_per_symbol, input_in_phase_signal);
     integrate(internal_buffer2, signal_length, 2*samples_per_symbol, input_quadrature_signal);
@@ -97,6 +101,7 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     uint16_t timing_window = 10*samples_per_symbol; // TODO: 200*samples_per_symbol;
     double timing_angle = 0;
     double* timing_angle_log = internal_buffer;
+    double* toff = internal_buffer2;
 
     double temp;
 
@@ -123,5 +128,25 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
         loop_filt = pll_params.G1*phase_error + lower;
         dco = dco + loop_filt;
     }
-    std::cout << std::endl << timing_angle << std::endl;
+
+    toff[0] = floor(timing_angle_log[0] + 0.5);
+    for (uint16_t i = 1; i < signal_length; i++){
+        // The difference of of consecutive angles must be smaller than π
+        toff[i] = floor(timing_angle_log[i - 1] + M_PI * floor((timing_angle_log[i] - timing_angle_log[i - 1]) / M_PI) + 0.5);
+    }
+    
+    uint16_t k = 0;
+    for (uint16_t i = 2*samples_per_symbol; i < signal_length; i += 2*samples_per_symbol){
+        if ((i - toff[i] + samples_per_symbol) < signal_length) {
+            input_in_phase_signal[k] = input_in_phase_signal[i - static_cast<uint16_t>(toff[i])];
+            input_quadrature_signal[k] = input_quadrature_signal[i - static_cast<uint16_t>(toff[i]) + samples_per_symbol];
+        }
+        k += 1;
+    }
+
+    for (uint16_t i = 0; i < symbols_n/2; i++){
+        signal[2*i] = input_in_phase_signal[i] > 0;
+        signal[2*i+1] = input_quadrature_signal[i] > 0;
+    }
+
 }
