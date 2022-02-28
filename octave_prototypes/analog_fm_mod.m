@@ -6,10 +6,10 @@ fd = fm_states.fd;
 wd = 2*pi*fd/Fs;
 nsam = length(mod);
 
-if 1
-    mod = filter(fm_states.prede,1,mod);
-    mod = mod/max(mod);                                                       % AGC to set deviation
-end
+%if 1
+   % mod = filter(fm_states.prede,1,mod);
+    %mod = mod/max(mod);                                                       % AGC to set deviation
+%end
 
 tx_phase = 0;
 Q = zeros(1,nsam);
@@ -23,7 +23,4 @@ for i=0:nsam-1
     I(i+1) = real(tx(i+1));
     Q(i+1) = imag(tx(i+1));
 end
-I
-Q
-
 end

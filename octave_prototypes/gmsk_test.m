@@ -5,7 +5,7 @@ verbose = sim_in.verbose;
 Rs = 4800;
 
 gmsk_states.verbose = verbose;
-gmsk_states.coherent_demod = sim_in.coherent_demod;
+gmsk_states.precoding = sim_in.precoding;
 gmsk_states.phase_track = 0;
 gmsk_states = gmsk_init(gmsk_states, Rs);
 M = gmsk_states.M;
@@ -14,10 +14,12 @@ Rs = gmsk_states.Rs;
 Bfm = gmsk_states.fm_states.Bfm;
 
 for ne = 1:length(EbNodB)
+  
+  
     aEbNodB = EbNodB(ne);
     EbNo = 10^(aEbNodB/10);
     variance = Fs/(Rs*EbNo);
-
+    
     tx_bits = round(rand(1, nsym));
     %tx_bits = ones(1, nsym);
     %tx_bits = zeros(1, nsym);

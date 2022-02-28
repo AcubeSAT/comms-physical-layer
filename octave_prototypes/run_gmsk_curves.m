@@ -1,13 +1,13 @@
-function run_gmsk_curves
-sim_in.coherent_demod = 1;
-sim_in.nsym = 48000;
+sim_in.precoding = 1;
+sim_in.nsym = 10000;
 sim_in.EbNodB = 2:10;
 sim_in.verbose = 1;
 
 gmsk_coh = gmsk_test(sim_in);
 
+sim_in.precoding = 0;
+
 gmsk_noncoh = gmsk_test(sim_in);
-sim_in.coherent_demod = gmsk_noncoh;
 
 Rs = gmsk_coh.Rs;
 EbNo  = 10 .^ (sim_in.EbNodB/10);
@@ -20,8 +20,8 @@ figure;
 clf;
 semilogy(sim_in.EbNodB, gmsk_theory.BERvec,'r;GMSK theory;')
 hold on;
-semilogy(sim_in.EbNodB, gmsk_coh.BERvec,'g;GMSK sim coherent;')
-semilogy(sim_in.EbNodB, gmsk_noncoh.BERvec,'b;GMSK sim non-coherent;')
+semilogy(sim_in.EbNodB, gmsk_coh.BERvec,'g;GMSK coherent, without precoder;')
+semilogy(sim_in.EbNodB, gmsk_noncoh.BERvec,'b;GMSK coherent with precoder;')
 hold off;
 grid("minor");
 axis([min(sim_in.EbNodB) max(sim_in.EbNodB) 1E-4 1])
@@ -38,14 +38,11 @@ figure;
 clf;
 semilogy(sim_in.EbNodB+RsOnB_dB, gmsk_theory.BERvec,'r;GMSK theory;')
 hold on;
-semilogy(sim_in.EbNodB+RsOnB_dB, gmsk_coh.BERvec,'g;GMSK sim coherent;')
-semilogy(sim_in.EbNodB+RsOnB_dB, gmsk_noncoh.BERvec,'b;GMSK sim non-coherent;')
+semilogy(sim_in.EbNodB+RsOnB_dB, gmsk_coh.BERvec,'g;GMSK coherent, without precoder;')
+semilogy(sim_in.EbNodB+RsOnB_dB, gmsk_noncoh.BERvec,'b;GMSK coherent with precoder;')
 hold off;
 grid("minor");
 axis([min(sim_in.EbNodB+RsOnB_dB) max(sim_in.EbNodB+RsOnB_dB) 1E-4 1])
 legend("boxoff");
 xlabel("C/No for Rs=4800 bit/s and 1 Hz noise bandwidth (dB)");
-ylabel("Bit Error Rate (BER)")
-
-endfunction
-
+ylabel("Bit Error Rate (BER)");

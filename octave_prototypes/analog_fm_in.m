@@ -36,11 +36,12 @@ fm_states.nsym_delay = ncoeffs/Ts;
 % some of the FM signal spectra.  This filter isn't really required for high
 % SNRs > 20dB.
 
+
 fc = (Bfm/2)/(FsOn2);
-fm_states.bin  = firls(ncoeffs,[0 fc*(1-0.05) fc*(1+0.05) 1],[1 1 0.01 0.01]);
+%fm_states.bin  = firls(ncoeffs,[0 fc*(1-0.05) fc*(1+0.05) 1],[1 1 0.01 0.01]);
 
 % demoduator output filter to limit us to fm_max (e.g. 3kHz)
 
 fc = fm_max/(FsOn2);
-fm_states.bout = firls(ncoeffs,[0 0.95*fc 1.05*fc 1], [1 1 0.01 0.01]);
+%fm_states.bout = firls(ncoeffs,[0 0.95*fc 1.05*fc 1], [1 1 0.01 0.01]);
 end
