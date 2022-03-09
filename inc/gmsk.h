@@ -16,8 +16,8 @@ struct PLLParameters{
 
 class GMSKTranscoder {
 private:
-    double internal_buffer[1 << 12]; // TODO: Determine size (signal_length * max_samples_per_symbol)
-    double internal_buffer2[1 << 12];
+    double internal_buffer[1000]; // TODO: Determine size (signal_length * max_samples_per_symbol)
+    double internal_buffer2[1000];
     uint32_t sampling_frequency;
     uint32_t sampling_rate;
     uint32_t samples_per_symbol;
@@ -56,6 +56,7 @@ public:
     // Consider changing input IQ signal to const
     void
     demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length, bool *signal);
+
 };
 
 #endif //TC_SYNCHRONIZATION_GMSK_H

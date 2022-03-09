@@ -50,33 +50,30 @@ double gmsk_demod_coeff[] = {
 
 void GMSKTranscoder::modulate(int8_t *signal, uint16_t signal_length, double *in_phase_signal,
                               double *quadrature_signal) {
+
     uint16_t samples_n = samples_per_symbol * signal_length;
+
+    internal_buffer2[0] = (signal[0]+1)%2;
+    for (uint16_t i = 0; i < signal_length-1; i++){
+        internal_buffer2[i+1] = (signal[i+1]+signal[i] + i+1)%2;
+    }
 
     // NRZ encoding
     for (uint16_t i = 0; i < signal_length; i++) {
         // TODO: HAL implementation
         for (uint16_t j = 0; j < samples_per_symbol; j++) {
-            internal_buffer[i * samples_per_symbol + j] = -1 + 2 * (signal[i]);
+            internal_buffer[i * samples_per_symbol + j] = -1 + 2 * (internal_buffer2[i]);
         }
     }
+
     // Precoding
-    int8_t tmp1 = internal_buffer[0];
-    int8_t tmp2;
-    for (uint16_t i = 1; i < signal_length; i++){
-        tmp2 = internal_buffer[i];
-        internal_buffer2[i] = internal_buffer[i]* tmp1 * (-1 + 2*(i%2==0));
-        tmp1 = tmp2;
-    }
     uint16_t s = 41;
 
-    void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double *input_signal, uint16_t size,
-                    double *output_signal);
-
     // Filter matching
-    filter_fir(gmsk_mod_coeff, s, internal_buffer2, samples_n, internal_buffer);
+    filter_fir(gmsk_mod_coeff, s, internal_buffer, samples_n, internal_buffer2);
 
     // FM Modulator
-    fm_transcoder.modulate(internal_buffer, samples_n, in_phase_signal, quadrature_signal);
+    fm_transcoder.modulate(internal_buffer2, samples_n, in_phase_signal, quadrature_signal);
 }
 
 void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length,

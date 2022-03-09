@@ -53,7 +53,8 @@ tw = 200*M;
 timing_clock_phase = 0;
 timing_angle = 0;
 timing_angle_log = zeros(1,nsam);
-
+a=1;
+if a ==1
 for i=1:nsam
 % update sample timing estimate every tw samples
      if mod(i,tw) == 0
@@ -82,7 +83,7 @@ for i=1:nsam
      dco_log(i) = dco;
      end
     % sample integrator output at correct timing instant
-
+end
     %timing_adj = timing_angle_log*2*M/(2*pi);
     timing_adj_uw = unwrap(timing_angle_log)*2*M/(2*pi);
     % Toff = floor(2*M+timing_adj);

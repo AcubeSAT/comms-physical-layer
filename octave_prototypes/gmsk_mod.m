@@ -10,6 +10,7 @@ tx_symbols = zeros(1,nsam);
 for i=1:nsym
     tx_symbols(1+(i-1)*M:i*M) = -1 + 2*tx_bits(i);
 end
+
 if(gmsk_states.precoding==0)
   tx_bits1=shift(tx_symbols,M);
   tx_bits1(1:M)=1;
