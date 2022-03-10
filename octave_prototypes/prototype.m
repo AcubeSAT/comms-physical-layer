@@ -25,9 +25,9 @@ tx_bits = [0, 0, 1, 0, 1, 0, 1, 1, 1, 0]
 [tx tx_filt tx_symbols] = gmsk_mod(gmsk_states, tx_bits);
 nsam = length(tx);
 noise = sqrt(variance/2)*(randn(1,nsam) + j*randn(1,nsam));
-rx    = tx*exp(j*pi/2) 
+rx    = tx*exp(j*pi/2) ;
 [rx_bits rx_out rx_filt] = gmsk_demod(gmsk_states, rx(1:length(rx)));
-
+rx_bits
     Nerrs_min = nsym;
     Nbits_min = nsym;
     l = length(rx_bits);

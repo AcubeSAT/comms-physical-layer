@@ -142,8 +142,8 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     }
 
     for (uint16_t i = 0; i < symbols_n/2; i++){
-        signal[2*i] = input_in_phase_signal[i] > 0;
-        signal[2*i+1] = input_quadrature_signal[i] > 0;
+        signal[2*i] = input_in_phase_signal[i] < 0;
+        signal[2*i+1] = input_quadrature_signal[i] < 0;
     }
 
 }

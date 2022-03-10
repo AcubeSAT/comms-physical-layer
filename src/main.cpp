@@ -24,16 +24,16 @@ int main() {
         i_signal[i] = temp;
     }
     gmsk_modulate.demodulate(i_signal, q_signal, 100, output);
-//    for(int i =0; i<10; i++)
-//    {
-//        std::cout<<static_cast<uint16_t>(gmsk_in_signal[i])<<" ";
-//    }
-//    std::cout<<"\n";
-//
-//    for(int i =0; i<10; i++)
-//    {
-//        std::cout<<output[i]<<" ";
-//    }
+    for(int i =0; i<10; i++)
+    {
+        std::cout<<static_cast<uint16_t>(gmsk_in_signal[i])<<" ";
+    }
+    std::cout<<"\n";
+
+    for(int i =0; i<10; i++)
+    {
+        std::cout<<output[i]<<" ";
+    }
     //fm_modulate.modulate(in_signal, 20, i_signal, q_signal);
     return 0;
 }
