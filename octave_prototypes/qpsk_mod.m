@@ -5,6 +5,6 @@ function symbol = qpsk_mod(two_bits)
         case (0) symbol =  1;
         case (1) symbol =  j;
         case (2) symbol = -j;
-        case (3) symbol = -1;
-    endswitch
+      case (3) symbol = -1;
+        endswitch
 endfunction
