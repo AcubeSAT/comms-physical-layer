@@ -9,7 +9,10 @@ add_executable(tc_synchronization
         inc/filter.h
         inc/fm.h
         inc/gmsk.h
+        inc/oqpsk.h
+        src/oqpsk.cpp
         src/fm.cpp
         src/gmsk.cpp
         src/main.cpp
-        src/filter.cpp)
+        src/filter.cpp
+        )
