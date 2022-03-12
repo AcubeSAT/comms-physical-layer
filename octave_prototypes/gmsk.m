@@ -1,32 +1,14 @@
-% gmsk.m
-% David Rowe Dec 2014
-%
-% GMSK modem implementation and simulations to test
-
-%
-% [X] plot eye diagram
-% [X] BER curves with reas match to theoretical
-% [X] fine timing estimator
-%     [X] test with fine timing error by resampling
-% [X] phase/freq estimator
-%     + need initial acquisition and tracking
-%     [X] test with different freq offsets
-% [X] coarse timing estimator (sync up to known test frames)
-%     [X] test with different coarse timing offsets
-% [ ] file read/write interface
-%     [ ] refactor into tx/rx functions
-% [X] modify for 1200 (or any) bit/s operation
-%     + ie GMSK filter coeff generation
-%     + or just re-sampling? e.g. ratio of Fs to Rs?
-% [ ] way to measure input SNR to demod
-%     + Maybe based on test tone/carrier from the other side?
-%     + think about process ... total signal plus noise power?  Increase power until S+N doubles?
-% [X] generate curves for baseline modem and with sync algorithms
-%     [X] used coarse sync code to remove need for knowing delays
-% [X] demod level indep
-%     + scaled OK +/- 20dB same BER
-% [X] effect of DC signals from SDRs
-%     + simulated effect of general interferer at -1500Hz, at an amplitude of 4
-%       (12 dB above GMSK signal), it started to affect BER e.g. 0.007 to 0.009
-%       Line appeared about 30dB above top of GMSK signal.
-% [ ] effect of quantisation noise
+gmsk_mod_coeff = [6.455906007234699e-014, 1.037067381285011e-012, 1.444835156335346e-011,...
+1.745786683011439e-010, 1.829471305298363e-009, 1.662729407135958e-008,...
+1.310626978701910e-007, 8.959797186410516e-007, 5.312253663302771e-006,...
+2.731624380156465e-005, 1.218217140199093e-004, 4.711833994209542e-004,...
+1.580581180127418e-003, 4.598383433830095e-003, 1.160259430889949e-002,...
+2.539022692626253e-002, 4.818807833062393e-002, 7.931844341164322e-002,...
+1.132322945270602e-001, 1.401935338024111e-001, 1.505383695578516e-001,...
+1.401935338024111e-001, 1.132322945270601e-001, 7.931844341164328e-002,...
+4.818807833062393e-002, 2.539022692626253e-002, 1.160259430889949e-002,...
+4.598383433830090e-003, 1.580581180127420e-003, 4.711833994209542e-004,...
+1.218217140199093e-004, 2.731624380156465e-005, 5.312253663302753e-006,...
+8.959797186410563e-007, 1.310626978701910e-007, 1.662729407135958e-008,...
+1.829471305298363e-009, 1.745786683011426e-010, 1.444835156335356e-011,...
+1.037067381285011e-012, 6.455906007234699e-014];
