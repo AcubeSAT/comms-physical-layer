@@ -1,7 +1,7 @@
 function oqpsk_states = oqpsk_init(oqpsk_states, Rs)
   % general 
   global rrcfilter
-  oqpsk_states.Fs  = 16*Rs;
+  oqpsk_states.Fs  = 4*Rs;
   oqpsk_states.Rs  = Rs;
   oqpsk_states.bps = 2;  
   oqpsk_states.rrcfilter=rrcfilter;
