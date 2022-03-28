@@ -1,7 +1,7 @@
 #include "oqpsk.hpp"
 
 void
-OQPSKTranscoder::modulate(uint8_t *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal) {
+OQPSKTranscoder::modulate(uint8_t *signal, uint16_t signal_length, float32_t *in_phase_signal, float32_t *quadrature_signal) {
     uint32_t nsym = signal_length / 2;
 
     // In-phase and quadrature are calculated separately in order to only use a single buffer
@@ -35,7 +35,7 @@ OQPSKTranscoder::modulate(uint8_t *signal, uint16_t signal_length, double *in_ph
     for (uint32_t m = 0; m < samples_per_symbol / 2; m++) {
         internal_buffer[samples_per_symbol * nsym + m] = 0;
     }
-
+    arm_fir_f32(&armFIRInstanceF32, internal_buffer, in_phase_signal, blockLen);
     //filter_fir(oqpsk_taps, 23, internal_buffer, samples_per_symbol * nsym + samples_per_symbol / 2, in_phase_signal);
 
     // Calculate quadrature
@@ -67,6 +67,6 @@ OQPSKTranscoder::modulate(uint8_t *signal, uint16_t signal_length, double *in_ph
         internal_buffer[m] = 0;
     }
 
-    // filter_fir(oqpsk_taps, 44, internal_buffer, samples_per_symbol * nsym + samples_per_symbol / 2, quadrature_signal);
+    arm_fir_f32(&armFIRInstanceF32, internal_buffer, quadrature_signal, blockLen);
 
 }
