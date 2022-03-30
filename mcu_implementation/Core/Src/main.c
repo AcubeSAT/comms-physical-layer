@@ -100,12 +100,13 @@ int main(void)
     float i_signal[10000] = {0};
     float q_signal[10000] = {0};
     while (1) {
-        HAL_Delay(10000);
-        main_cpp(i_signal, q_signal);
-        for(uint8_t i =0; i<20; i++) {
-            sprintf(str,"in phase sample %f\r\n", i_signal[i]);
-            statusTypeDef = HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
-        }
+        uint32_t e = main_cpp(i_signal, q_signal);
+        sprintf(str,"Time needed to modulate 200 kbits %d ms\r\n", e);
+        statusTypeDef = HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
+//        for(uint8_t i =0; i<18; i++) {
+//            sprintf(str,"in phase sample %f\r\n", i_signal[i]);
+//            statusTypeDef = HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
+//        }
 
 
 
