@@ -53,16 +53,16 @@ void GMSKTranscoder::modulate(int8_t *signal, uint16_t signal_length, double *in
 
     uint16_t samples_n = samples_per_symbol * signal_length;
 
-    internal_buffer2[0] = (signal[0]+1)%2;
+    internal_buffer_quadrature[0] = (signal[0]+1)%2;
     for (uint16_t i = 0; i < signal_length-1; i++){
-        internal_buffer2[i+1] = (signal[i+1]+signal[i] + i+1)%2;
+        internal_buffer_quadrature[i+1] = (signal[i+1]+signal[i] + i+1)%2;
     }
 
     // NRZ encoding
     for (uint16_t i = 0; i < signal_length; i++) {
         // TODO: HAL implementation
         for (uint16_t j = 0; j < samples_per_symbol; j++) {
-            internal_buffer[i * samples_per_symbol + j] = -1 + 2 * (internal_buffer2[i]);
+            internal_buffer_in_phase[i * samples_per_symbol + j] = -1 + 2 * (internal_buffer_quadrature[i]);
         }
     }
 
@@ -70,10 +70,10 @@ void GMSKTranscoder::modulate(int8_t *signal, uint16_t signal_length, double *in
     uint16_t s = 41;
 
     // Filter matching
-    filter_fir(gmsk_mod_coeff, s, internal_buffer, samples_n, internal_buffer2);
+    filter_fir(gmsk_mod_coeff, s, internal_buffer_in_phase, samples_n, internal_buffer_quadrature);
 
     // FM Modulator
-    fm_transcoder.modulate(internal_buffer2, samples_n, in_phase_signal, quadrature_signal);
+    fm_transcoder.modulate(internal_buffer_quadrature, samples_n, in_phase_signal, quadrature_signal);
 }
 
 void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length,
@@ -83,11 +83,15 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     float frequency_deviation_component = 2 * M_PI * max_deviation / sampling_frequency;
     double rx_int[2 << 12] = {0};
 
-    filter_fir(gmsk_mod_coeff, 29, input_in_phase_signal, signal_length, internal_buffer);
-    filter_fir(gmsk_mod_coeff, 29, input_quadrature_signal, signal_length, internal_buffer2);
+    filter_fir(gmsk_mod_coeff, 29, input_in_phase_signal, signal_length, internal_buffer_in_phase);
+    filter_fir(gmsk_mod_coeff, 29, input_quadrature_signal, signal_length, internal_buffer_quadrature);
 
-    integrate(internal_buffer, signal_length, 2*samples_per_symbol, input_in_phase_signal);
-    integrate(internal_buffer2, signal_length, 2*samples_per_symbol, input_quadrature_signal);
+    integrate(internal_buffer_in_phase, signal_length, 2*samples_per_symbol, input_in_phase_signal);
+    integrate(internal_buffer_quadrature, signal_length, 2*samples_per_symbol, input_quadrature_signal);
+
+    // Add Wiener Filter for equalisation
+    filter_fir(delayed_taps, 6*samples_per_symbol, input_in_phase_signal, signal_length, internal_buffer_in_phase);
+    filter_fir(delayed_taps, 6*samples_per_symbol, input_quadrature_signal, signal_length, internal_buffer_quadrature);
 
     // Implement PLL
     double dco = 0;
@@ -97,8 +101,8 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     double timing_clock_phase = 0;
     uint16_t timing_window = 10*samples_per_symbol; // TODO: 200*samples_per_symbol;
     double timing_angle = 0;
-    double* timing_angle_log = internal_buffer;
-    double* toff = internal_buffer2;
+    double* timing_angle_log = input_in_phase_signal;
+    double* toff = input_quadrature_signal;
 
     double temp;
 
@@ -107,8 +111,8 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
             double i_clock_phase = 0;
             double q_clock_phase = 0;
             for (uint16_t j = i - timing_window + 1; j <= i; j++){
-                i_clock_phase += fabs(input_in_phase_signal[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
-                q_clock_phase -= fabs(input_in_phase_signal[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+                i_clock_phase += fabs(internal_buffer_in_phase[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+                q_clock_phase -= fabs(internal_buffer_in_phase[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
                 }
             timing_angle = atan2(q_clock_phase, i_clock_phase);
             timing_clock_phase = timing_angle;
@@ -117,10 +121,10 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
         }
         timing_angle_log[i] = timing_angle;
 
-        temp = input_in_phase_signal[i]*cos(dco) + input_quadrature_signal[i]*sin(dco);
-        input_quadrature_signal[i] = -input_in_phase_signal[i]*sin(dco) + cos(dco)*input_quadrature_signal[i];
-        input_in_phase_signal[i] = temp;
-        phase_error = (-1+2*signs(input_in_phase_signal[i]*input_quadrature_signal[i]))*cos(timing_clock_phase);
+        temp = internal_buffer_in_phase[i]*cos(dco) + internal_buffer_quadrature[i]*sin(dco);
+        internal_buffer_quadrature[i] = -internal_buffer_in_phase[i]*sin(dco) + cos(dco)*internal_buffer_quadrature[i];
+        internal_buffer_in_phase[i] = temp;
+        phase_error = (-1+2*signs(internal_buffer_in_phase[i]*internal_buffer_quadrature[i]))*cos(timing_clock_phase);
         lower = pll_params.G2*phase_error + lower;
         loop_filt = pll_params.G1*phase_error + lower;
         dco = dco + loop_filt;
@@ -135,15 +139,15 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     uint16_t k = 0;
     for (uint16_t i = 2*samples_per_symbol; i < signal_length; i += 2*samples_per_symbol){
         if ((i - toff[i] + samples_per_symbol) < signal_length) {
-            input_in_phase_signal[k] = input_in_phase_signal[i - static_cast<uint16_t>(toff[i])];
-            input_quadrature_signal[k] = input_quadrature_signal[i - static_cast<uint16_t>(toff[i]) + samples_per_symbol];
+            internal_buffer_in_phase[k] = internal_buffer_in_phase[i - static_cast<uint16_t>(toff[i])];
+            internal_buffer_quadrature[k] = internal_buffer_quadrature[i - static_cast<uint16_t>(toff[i]) + samples_per_symbol];
         }
         k += 1;
     }
 
     for (uint16_t i = 0; i < symbols_n/2; i++){
-        signal[2*i] = input_in_phase_signal[i] < 0;
-        signal[2*i+1] = input_quadrature_signal[i] < 0;
+        signal[2*i] = internal_buffer_in_phase[i] < 0;
+        signal[2*i+1] = internal_buffer_quadrature[i] < 0;
     }
 
 }
