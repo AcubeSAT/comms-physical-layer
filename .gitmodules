@@ -1,6 +1,6 @@
 [submodule "etl"]
-	path = etl
+	path = cpp_implementation/external/etl
 	url = https://github.com/ETLCPP/etl.git
 [submodule "Catch2"]
-	path = Catch2
+	path = cpp_implementation/external/Catch2
 	url = https://github.com/catchorg/Catch2.git
