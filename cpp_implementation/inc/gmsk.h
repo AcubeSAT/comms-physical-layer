@@ -16,8 +16,8 @@ struct PLLParameters{
 
 class GMSKTranscoder {
 private:
-    double internal_buffer_in_phase[1000]; // TODO: Determine size (signal_length * max_samples_per_symbol)
-    double internal_buffer_quadrature[1000];
+    double internal_buffer_in_phase[10000]; // TODO: Determine size (signal_length * max_samples_per_symbol)
+    double internal_buffer_quadrature[10000];
     double wiener_taps[3] = {-0.0859984, 1.0116342, -0.0859984};
     double delayed_taps[120];    // TODO: Determine size as 6 * samples/symbol, here max samples/symbol considered 20
     uint32_t sampling_frequency;
