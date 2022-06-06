@@ -1,0 +1,18 @@
+/snap/clion/193/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/snap/clion/193/bin/ninja/linux/ninja -G Ninja -S /home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation -B /home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug
+-- The C compiler identification is GNU 11.2.0
+-- The CXX compiler identification is GNU 11.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- etl | Version string determined with git describe: 20.28.0
+-- etl | Determined ETL version 20.28.0 from the git tag
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug

@@ -6,11 +6,6 @@
 #define PACKET_LENGTH 16
 #define NUM_PACKETS 2
 
-TEST_CASE("helloWorld", "[helloWorld]" ) {
-    std::cout << "Hello, World!" << std::endl;
-    CHECK(1==1);
-}
-
 TEST_CASE("GMSK mod/demod (No noise)", "[noNoiseModem]" ) {
 
     int sample_frequency = 48000;

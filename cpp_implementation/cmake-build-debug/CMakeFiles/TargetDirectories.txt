@@ -1,0 +1,13 @@
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/CMakeFiles/common.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/CMakeFiles/tc_synchronization.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/CMakeFiles/tests.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/etl/CMakeFiles/edit_cache.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/etl/CMakeFiles/rebuild_cache.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/Catch2/CMakeFiles/edit_cache.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/Catch2/CMakeFiles/rebuild_cache.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/Catch2/src/CMakeFiles/Catch2.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/Catch2/src/CMakeFiles/Catch2WithMain.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/Catch2/src/CMakeFiles/edit_cache.dir
+/home/kikas/Desktop/a3sat/tc_synchronization/cpp_implementation/cmake-build-debug/external/Catch2/src/CMakeFiles/rebuild_cache.dir
