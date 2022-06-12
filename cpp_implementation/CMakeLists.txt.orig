@@ -1,20 +1,17 @@
 cmake_minimum_required(VERSION 3.19)
 project(tc_synchronization)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/external/etl/include")
 
 add_subdirectory(external/etl)
 
 add_library(common OBJECT
-        src/BCHDecoder.cpp
-        src/ConvolutionalEncoder.cpp
         src/oqpsk.cpp
         src/fm.cpp
         src/gmsk.cpp
         src/filter.cpp
-        src/ldpc.cpp
         )
 
 add_executable(tc_synchronization
