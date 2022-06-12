@@ -8,7 +8,7 @@ void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double
     //  passed both here and in the initialization of the modems that defines which implementation is to be chosen
     for (uint16_t n = 0; n < size; n++) {
         output_signal[n] = 0;
-        for (uint16_t k = 0; k < std::fmin(n + 1, number_of_taps); k++) {
+        for (uint16_t k = 0; k < fmin(n + 1, number_of_taps); k++) {
             output_signal[n] += filter_taps[k] * input_signal[n - k];
         }
     }
@@ -19,7 +19,7 @@ void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double
 void integrate(const double *input_signal, uint16_t size, uint16_t number_of_taps, double *output_signal){
     for (uint16_t n = 0; n < size; n++) {
         output_signal[n] = 0;
-        for (uint16_t k = 0; k < std::fmin(n + 1, number_of_taps); k++) {
+        for (uint16_t k = 0; k < fmin(n + 1, number_of_taps); k++) {
             output_signal[n] += input_signal[n - k];
         }
     }
