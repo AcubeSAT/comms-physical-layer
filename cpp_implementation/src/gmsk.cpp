@@ -3,7 +3,7 @@
 #include <cstring>
 #include "filter.h"
 
-double gmsk_mod_coeff[] = {    // Gaussian filter taps for BTs = 0.25
+double gmsk_mod_coeff[] = {    // TODO: Correct Gaussian filter taps for BTs = 0.25
         0.00012196358875371516, 0.0003575949085643515, 0.0007969101279741153, 0.00158733366697561,
         0.0029597436514450237, 0.005259322046185844, 0.008977695411886089, 0.01477996823086869,
         0.023517398207332008, 0.03621464785828721, 0.053899076432571746, 0.07776153780287132,
@@ -17,6 +17,22 @@ double gmsk_mod_coeff[] = {    // Gaussian filter taps for BTs = 0.25
         0.014840889332845109, 0.009038616513862507, 0.0053202431481622625, 0.0030206647534214426,
         0.0016482547689520288,0.0008578312299505342, 0.00041851601054077037, 0.00018288469073013403,
         6.092110197641887e-05};
+
+double gmsk_mod_coeff2[] = {   // Hardcoded BTs = 0.5, Rowetel
+    6.455906007234699e-014, 1.037067381285011e-012, 1.444835156335346e-011,
+    1.745786683011439e-010, 1.829471305298363e-009, 1.662729407135958e-008,
+    1.310626978701910e-007, 8.959797186410516e-007, 5.312253663302771e-006,
+    2.731624380156465e-005, 1.218217140199093e-004, 4.711833994209542e-004,
+    1.580581180127418e-003, 4.598383433830095e-003, 1.160259430889949e-002,
+    2.539022692626253e-002, 4.818807833062393e-002, 7.931844341164322e-002,
+    1.132322945270602e-001, 1.401935338024111e-001, 1.505383695578516e-001,
+    1.401935338024111e-001, 1.132322945270601e-001, 7.931844341164328e-002,
+    4.818807833062393e-002, 2.539022692626253e-002, 1.160259430889949e-002,
+    4.598383433830090e-003, 1.580581180127420e-003, 4.711833994209542e-004,
+    1.218217140199093e-004, 2.731624380156465e-005, 5.312253663302753e-006,
+    8.959797186410563e-007, 1.310626978701910e-007, 1.662729407135958e-008,
+    1.829471305298363e-009, 1.745786683011426e-010, 1.444835156335356e-011,
+    1.037067381285011e-012, 6.455906007234699e-014};
 
 double gmsk_demod_coeff[] = {
         -0.000153959924563, 0.000000000000000, 0.000167227768379, 0.000341615513437,
@@ -69,7 +85,7 @@ void GMSKTranscoder::modulate(int8_t *signal, uint16_t signal_length, double *in
     uint16_t s = 41;
 
     // Filter matching
-    filter_fir(gmsk_mod_coeff, s, internal_buffer_in_phase, samples_n, internal_buffer_quadrature);
+    filter_fir(gmsk_mod_coeff2, s, internal_buffer_in_phase, samples_n, internal_buffer_quadrature);
 
     // FM Modulator
     fm_transcoder.modulate(internal_buffer_quadrature, samples_n, in_phase_signal, quadrature_signal);
@@ -81,16 +97,22 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     uint16_t symbols_n = floor(signal_length / samples_per_symbol);
     float frequency_deviation_component = 2 * M_PI * max_deviation / sampling_frequency;
     double rx_int[2 << 12] = {0};
+    int numtaps = 41;
 
-    filter_fir(gmsk_mod_coeff, 29, input_in_phase_signal, signal_length, internal_buffer_in_phase);
-    filter_fir(gmsk_mod_coeff, 29, input_quadrature_signal, signal_length, internal_buffer_quadrature);
+    // Add Wiener Filter for equalisation (Convolution with the gaussian filter)
+    if(equalize){
+        filter_fir(delayed_taps, 6 * samples_per_symbol, gmsk_mod_coeff2, numtaps, convolved_filters);
+
+        filter_fir(convolved_filters, numtaps, input_in_phase_signal, signal_length, internal_buffer_in_phase);
+        filter_fir(convolved_filters, numtaps, input_quadrature_signal, signal_length, internal_buffer_quadrature);
+    }
+    else {
+        filter_fir(gmsk_mod_coeff2, numtaps, input_in_phase_signal, signal_length, internal_buffer_in_phase);
+        filter_fir(gmsk_mod_coeff2, numtaps, input_quadrature_signal, signal_length, internal_buffer_quadrature);
+    }
 
     integrate(internal_buffer_in_phase, signal_length, 2*samples_per_symbol, input_in_phase_signal);
     integrate(internal_buffer_quadrature, signal_length, 2*samples_per_symbol, input_quadrature_signal);
-
-    // Add Wiener Filter for equalisation
-    filter_fir(delayed_taps, 6*samples_per_symbol, input_in_phase_signal, signal_length, internal_buffer_in_phase);
-    filter_fir(delayed_taps, 6*samples_per_symbol, input_quadrature_signal, signal_length, internal_buffer_quadrature);
 
     // Implement PLL
     double dco = 0;
@@ -100,8 +122,8 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     double timing_clock_phase = 0;
     uint16_t timing_window = 10*samples_per_symbol; // TODO: 200*samples_per_symbol;
     double timing_angle = 0;
-    double* timing_angle_log = input_in_phase_signal;
-    double* toff = input_quadrature_signal;
+    double* timing_angle_log = internal_buffer_in_phase;
+    double* toff = internal_buffer_quadrature;
 
     double temp;
 
@@ -110,8 +132,8 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
             double i_clock_phase = 0;
             double q_clock_phase = 0;
             for (uint16_t j = i - timing_window + 1; j <= i; j++){
-                i_clock_phase += fabs(internal_buffer_in_phase[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
-                q_clock_phase -= fabs(internal_buffer_in_phase[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+                i_clock_phase += fabs(input_in_phase_signal[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+                q_clock_phase -= fabs(input_in_phase_signal[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
                 }
             timing_angle = atan2(q_clock_phase, i_clock_phase);
             timing_clock_phase = timing_angle;
@@ -120,10 +142,10 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
         }
         timing_angle_log[i] = timing_angle;
 
-        temp = internal_buffer_in_phase[i]*cos(dco) + internal_buffer_quadrature[i]*sin(dco);
-        internal_buffer_quadrature[i] = -internal_buffer_in_phase[i]*sin(dco) + cos(dco)*internal_buffer_quadrature[i];
-        internal_buffer_in_phase[i] = temp;
-        phase_error = (-1+2*signs(internal_buffer_in_phase[i]*internal_buffer_quadrature[i]))*cos(timing_clock_phase);
+        temp = input_in_phase_signal[i]*cos(dco) + input_quadrature_signal[i]*sin(dco);
+        input_quadrature_signal[i] = -input_in_phase_signal[i]*sin(dco) + cos(dco)*input_quadrature_signal[i];
+        input_in_phase_signal[i] = temp;
+        phase_error = (-1+2*signs(input_in_phase_signal[i]*input_quadrature_signal[i]))*cos(timing_clock_phase);
         lower = pll_params.G2*phase_error + lower;
         loop_filt = pll_params.G1*phase_error + lower;
         dco = dco + loop_filt;
@@ -138,15 +160,15 @@ void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_qua
     uint16_t k = 0;
     for (uint16_t i = 2*samples_per_symbol; i < signal_length; i += 2*samples_per_symbol){
         if ((i - toff[i] + samples_per_symbol) < signal_length) {
-            internal_buffer_in_phase[k] = internal_buffer_in_phase[i - static_cast<uint16_t>(toff[i])];
-            internal_buffer_quadrature[k] = internal_buffer_quadrature[i - static_cast<uint16_t>(toff[i]) + samples_per_symbol];
+            input_in_phase_signal[k] = input_in_phase_signal[i - static_cast<int16_t>(toff[i])];
+            input_quadrature_signal[k] = input_quadrature_signal[i - static_cast<int16_t>(toff[i]) + samples_per_symbol];
         }
         k += 1;
     }
 
     for (uint16_t i = 0; i < symbols_n/2; i++){
-        signal[2*i] = internal_buffer_in_phase[i] < 0;
-        signal[2*i+1] = internal_buffer_quadrature[i] < 0;
+        signal[2*i] = input_in_phase_signal[i] > 0;
+        signal[2*i+1] = input_quadrature_signal[i] > 0;
     }
 
 }

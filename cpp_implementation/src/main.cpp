@@ -15,7 +15,7 @@ int main() {
     uint8_t gmsk_in_signal[] = {0, 0, 0, 1, 1, 0, 1, 1};
     bool output[1000] = {0};
     FMTranscoder fm_modulate(48000, 24000, 0, 1200, 1, 1);
-    GMSKTranscoder gmsk_modulate(48000, 4800);
+    GMSKTranscoder gmsk_modulate(48000, 4800, false);
 
     OQPSKTranscoder oqpsk_modulate(10);
     oqpsk_modulate.modulate(gmsk_in_signal, 8, i_signal, q_signal);
