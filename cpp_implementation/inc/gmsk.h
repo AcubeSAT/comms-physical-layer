@@ -16,10 +16,12 @@ struct PLLParameters{
 
 class GMSKTranscoder {
 private:
-    double internal_buffer_in_phase[1000]; // TODO: Determine size (signal_length * max_samples_per_symbol)
-    double internal_buffer_quadrature[1000];
+    double internal_buffer_in_phase[60000]; // TODO: Determine size (signal_length * max_samples_per_symbol)
+    double internal_buffer_quadrature[60000];
     double wiener_taps[3] = {-0.0859984, 1.0116342, -0.0859984};
-    double delayed_taps[120];    // TODO: Determine size as 6 * samples/symbol, here max samples/symbol considered 20
+    double delayed_taps[60];    // TODO: Determine size as 6 * samples/symbol, here max samples/symbol considered 10
+    bool equalize;
+    double convolved_filters[109]; //TODO: Length is the length of gmsk_mod and delayed taps added (Now 60 + 49)
     uint32_t sampling_frequency;
     uint32_t sampling_rate;
     uint32_t samples_per_symbol;
@@ -30,7 +32,7 @@ private:
     PLLParameters pll_params;
 
 public:
-    GMSKTranscoder(uint32_t sample_frequency, uint32_t symb_rate) :
+    GMSKTranscoder(uint32_t sample_frequency, uint32_t symb_rate, bool equalize) :
             fm_transcoder(FMTranscoder(sample_frequency, symb_rate / 2, 0,
                                        symb_rate / 4, 0, 0)),
                                        symbol_rate(symb_rate), sampling_frequency(sample_frequency) {
@@ -39,9 +41,10 @@ public:
         max_deviation = symbol_rate / 4;
 
         // Adding 2-symbol delay between taps
-        std::fill(std::begin(delayed_taps), std::begin(delayed_taps) + 2*samples_per_symbol - 1, wiener_taps[0]);
-        std::fill(std::begin(delayed_taps) + 2*samples_per_symbol, std::begin(delayed_taps) + 4*samples_per_symbol - 1, wiener_taps[1]);
-        std::fill(std::begin(delayed_taps) + 4*samples_per_symbol, std::begin(delayed_taps) + 6*samples_per_symbol - 1, wiener_taps[2]);
+        std::fill(std::begin(delayed_taps), std::begin(delayed_taps) + 2*samples_per_symbol, wiener_taps[0]);
+        std::fill(std::begin(delayed_taps) + 2*samples_per_symbol, std::begin(delayed_taps) + 4*samples_per_symbol, wiener_taps[1]);
+        std::fill(std::begin(delayed_taps) + 4*samples_per_symbol, std::begin(delayed_taps) + 6*samples_per_symbol, wiener_taps[2]);
+        this->equalize = equalize;
 
         double zeta = 0.707;
         double wn = (2.0*10*M_PI*symbol_rate)/4800;
