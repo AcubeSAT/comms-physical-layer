@@ -2,6 +2,7 @@
 #define TC_SYNCHRONIZATION_LDPC_HPP
 
 #include <stdint.h>
+#include <cstddef>
 #include "PositionRowsEsoteric.hpp"
 #include "RowsParityBitsEsoteric.hpp"
 

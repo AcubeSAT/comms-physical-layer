@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.18)
 project(tc_synchronization)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -24,8 +24,8 @@ add_executable(tc_synchronization
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
-    file(GLOB test_main_SRC "tests/*.cpp")
-    file(GLOB test_SRC "tests/**/*.cpp")
+    file(GLOB test_main_SRC "test/*.cpp")
+    file(GLOB test_SRC "test/**/*.cpp")
 
     add_subdirectory(external/Catch2)
     add_executable(tests
@@ -35,4 +35,3 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
             )
     target_link_libraries(tests Catch2::Catch2WithMain)
 ENDIF ()
-
