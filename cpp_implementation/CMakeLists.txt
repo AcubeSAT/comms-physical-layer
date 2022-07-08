@@ -4,6 +4,16 @@ project(tc_synchronization)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/external/etl/include")
+include_directories(inc)
+include_directories(src)
+include_directories(lib/FreeRTOS)
+include_directories(lib/FreeRTOS/Source)
+include_directories(lib/FreeRTOS/Source/include)
+include_directories(lib/FreeRTOS/Source/portable)
+include_directories(lib/FreeRTOS/Source/portable/GCC)
+include_directories(lib/FreeRTOS/Source/portable/GCC/SAM)
+include_directories(lib/FreeRTOS/Source/portable/GCC/SAM/CM7)
+include_directories(lib/FreeRTOS/Source/portable/MemMang)
 
 add_subdirectory(external/etl)
 
@@ -20,6 +30,7 @@ add_library(common OBJECT
 add_executable(tc_synchronization
         $<TARGET_OBJECTS:common>
         src/main.cpp
+        src/main.c
         )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
