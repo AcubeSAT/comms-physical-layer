@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/external/etl/include")
 include_directories(inc)
+include_directories(inc/FreeRTOSTasks)
 include_directories(src)
+include_directories(src/FreeRTOSTasks)
 include_directories(lib/FreeRTOS)
 include_directories(lib/FreeRTOS/Source)
 include_directories(lib/FreeRTOS/Source/include)
@@ -27,10 +29,13 @@ add_library(common OBJECT
         src/ldpc.cpp
         )
 
+file(GLOB_RECURSE FREERTOS_SOURCES "lib/FreeRTOS/*.c")
+
 add_executable(tc_synchronization
         $<TARGET_OBJECTS:common>
         src/main.cpp
         src/main.c
+        ${FREERTOS_SOURCES}
         )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
