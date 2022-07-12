@@ -1,15 +1,19 @@
 cmake_minimum_required(VERSION 3.18)
 
 SET(CMAKE_C_COMPILER_WORKS 1)
-SET(CMAKE_C_COMPILER ${ARM_TOOLCHAIN_PATH}/arm-none-eabi-gcc)
+SET(CMAKE_C_COMPILER arm-none-eabi-gcc)
 SET(CMAKE_CXX_COMPILER_WORKS 1)
-SET(CMAKE_CXX_COMPILER ${ARM_TOOLCHAIN_PATH}/arm-none-eabi-g++)
+SET(CMAKE_CXX_COMPILER arm-none-eabi-g++)
 
 project(tc_synchronization)
 
+set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
+set(CMAKE_AR arm-none-eabi-ar)
+set(CMAKE_OBJCOPY arm-none-eabi-objcopy)
+set(CMAKE_OBJDUMP arm-none-eabi-objdump)
+set(SIZE arm-none-eabi-size)
+
 set(CMAKE_CXX_STANDARD 17)
-
-
 
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/external/etl/include")
 include_directories(inc)
