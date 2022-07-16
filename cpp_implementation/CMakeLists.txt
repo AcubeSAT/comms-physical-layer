@@ -15,6 +15,10 @@ set(SIZE arm-none-eabi-size)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_compile_options(-mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv4-sp-d16)
+add_link_options(-mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv4-sp-d16)
+
+
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/external/etl/include")
 include_directories(inc)
 include_directories(inc/FreeRTOSTasks)
@@ -41,12 +45,14 @@ add_library(common OBJECT
         src/ldpc.cpp)
 
 file(GLOB_RECURSE FREERTOS_SOURCES "lib/FreeRTOS/*.c")
+file(GLOB_RECURSE FREERTOS_TASKS "src/FreeRTOSTasks/*.c" "src/FreeRTOSTasks/*.cpp")
 
 add_executable(tc_synchronization
         $<TARGET_OBJECTS:common>
         src/main.cpp
         src/main.c
         ${FREERTOS_SOURCES}
+        ${FREERTOS_TASKS}
         )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
