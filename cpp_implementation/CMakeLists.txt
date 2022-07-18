@@ -46,3 +46,4 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
             )
     target_link_libraries(tests Catch2::Catch2WithMain)
 ENDIF ()
+

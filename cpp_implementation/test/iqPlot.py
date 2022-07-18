@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import math
 
-with open('iofiles/iqFileOQPSK4.txt') as f:
+with open('iofiles/iqOQPSKrep.txt') as f:
     iq = f.read().split()
+with open('iofiles/iqOQPSKrand.txt') as f:
+    iqRand = f.read().split()
 
 # Plot BER
 snr = [i for i in range(1, 21)]
@@ -19,10 +21,8 @@ for ebn0, i in enumerate(ber):
 plt.yscale('log')
 plt.plot(snr, ber, 'r-')
 plt.grid()
-#plt.plot(snr, ber_theory, 'b-')
 plt.show()
 
-#print(iq)
 i = []
 q = []
 for j in range(len(iq)):
@@ -30,15 +30,25 @@ for j in range(len(iq)):
         i.append(float(iq[j]))
     else:
         q.append(float(iq[j]))
-print(i[0:100])
-print(q)
-norm = [i[j]**2 + q[j]**2 for j in range(len(i))]
+# print(i[0:100])
+# print(q)
+# norm = [i[j]**2 + q[j]**2 for j in range(len(i))]
 
-plt.plot(i[0:500], 'r-')
-plt.plot(q[0:500], 'b-')
-plt.plot(norm[0:500], 'g-')
-print(norm)
+iRand = []
+qRand = []
+for j in range(len(iqRand)):
+    if j % 2 == 0:
+        iRand.append(float(iqRand[j]))
+    else:
+        qRand.append(float(iqRand[j]))
+
+plt.plot(i[0:160], 'r-')
+plt.plot(q[0:160], 'b-')
+plt.grid()
+# plt.plot(norm[0:500], 'g-')
+# print(norm)
 plt.show()
 
-plt.plot(i[0:500], q[0:500])
+plt.plot(iRand, qRand)
+plt.grid()
 plt.show()
