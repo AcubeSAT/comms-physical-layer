@@ -19,9 +19,6 @@ add_library(common OBJECT
         src/ldpc.cpp
         )
 
-add_executable(tc_synchronization
-        $<TARGET_OBJECTS:common>
-        )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
