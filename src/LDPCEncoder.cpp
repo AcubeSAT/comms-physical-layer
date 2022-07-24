@@ -1,9 +1,9 @@
+#include "LDPCEncoder.hpp"
 #include <cstdint>
-#include "ldpc.hpp"
 
-ldpc::ldpc() = default;
+LDPCEncoder::LDPCEncoder() = default;
 
-void ldpc::encoder(const bool *inputMessage, bool *outputMessage) {
+void LDPCEncoder::encode(const bool *inputMessage, bool *outputMessage) {
 
     bool encodedMessage[sizeEncodedMessage];
     for (bool &i: encodedMessage) {

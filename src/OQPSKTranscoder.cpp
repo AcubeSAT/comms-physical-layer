@@ -1,6 +1,6 @@
-#include <oqpsk.h>
+#include "filter.hpp"
+#include <OQPSKTranscoder.hpp>
 #include <iostream>
-#include "filter.h"
 
 #define NUM_OQPSK_TAPS 23
 

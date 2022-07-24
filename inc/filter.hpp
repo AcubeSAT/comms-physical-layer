@@ -1,5 +1,3 @@
-#ifndef TC_SYNCHRONIZATION_FILTER_H
-#define TC_SYNCHRONIZATION_FILTER_H
 #pragma once
 
 #include <math.h>
@@ -18,5 +16,3 @@ void multiply_vec(double *signal, uint16_t length, double coef);
 inline bool signs(double x){
     return x > 0;
 }
-
-#endif //TC_SYNCHRONIZATION_FILTER_H

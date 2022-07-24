@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "filter.hpp"
 
 void filter_fir(const double *filter_taps, uint16_t number_of_taps, const double *input_signal, uint16_t size,
                 double *output_signal) {

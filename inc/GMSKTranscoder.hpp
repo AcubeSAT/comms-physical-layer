@@ -1,8 +1,6 @@
-#ifndef TC_SYNCHRONIZATION_GMSK_H
-#define TC_SYNCHRONIZATION_GMSK_H
 #pragma once
 
-#include <fm.h>
+#include <FMTranscoder.hpp>
 #include <cmath>
 #include <iostream>
 
@@ -68,5 +66,3 @@ public:
     demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length, bool *signal);
 
 };
-
-#endif //TC_SYNCHRONIZATION_GMSK_H

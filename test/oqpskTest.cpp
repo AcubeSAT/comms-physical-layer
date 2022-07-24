@@ -1,8 +1,8 @@
+#include "GMSKTranscoder.hpp"
+#include "OQPSKTranscoder.hpp"
 #include "catch2/catch_all.hpp"
-#include "oqpsk.h"
-#include "gmsk.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #define PACKET_LENGTH 8
 #define NUM_PACKETS 5

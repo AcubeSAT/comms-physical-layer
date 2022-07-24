@@ -1,5 +1,4 @@
-#ifndef TC_SYNCHRONIZATION_FM_H
-#define TC_SYNCHRONIZATION_FM_H
+#pragma once
 
 #include <cstdint>
 
@@ -45,5 +44,3 @@ public:
 
     void modulate(const double *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal);
 };
-
-#endif //TC_SYNCHRONIZATION_FM_H

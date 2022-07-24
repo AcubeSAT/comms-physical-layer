@@ -1,5 +1,4 @@
-#ifndef TC_SYNCHRONIZATION_BCHDECODER_HPP
-#define TC_SYNCHRONIZATION_BCHDECODER_HPP
+#pragma once
 
 #include <cstdint>
 #include <optional>
@@ -79,5 +78,3 @@ const etl::map<uint8_t, uint8_t, 63> BCHDecoder::syndromesHash { {98, 0}  , {49,
                                                                , {87, 48} , {73, 49}, {70, 50} , {35, 51} , {115, 52}, {91, 53}
                                                                , {79, 54} , {69, 55}, {64, 56} , {32, 57} , {16, 58} , {8, 59}
                                                                , {4, 60}  , {2, 61} , {1, 62} };
-
-#endif //TC_SYNCHRONIZATION_BCHDECODER_HPP

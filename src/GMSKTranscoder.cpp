@@ -1,7 +1,7 @@
-#include <gmsk.h>
-#include <iostream>
+#include "filter.hpp"
+#include <GMSKTranscoder.hpp>
 #include <cstring>
-#include "filter.h"
+#include <iostream>
 
 double gmsk_mod_coeff[] = {    // TODO: Correct Gaussian filter taps for BTs = 0.25
         0.00012196358875371516, 0.0003575949085643515, 0.0007969101279741153, 0.00158733366697561,

@@ -1,5 +1,4 @@
-#ifndef TC_SYNCHRONIZATION_ROWSPARITYBITSESOTERIC_HPP
-#define TC_SYNCHRONIZATION_ROWSPARITYBITSESOTERIC_HPP
+#pragma once
 
 #include <stdint.h>
 
@@ -1031,6 +1030,3 @@ inline static const uint16_t rowsParityBitsEsoteric[sizeParityEsoteric] = {
     970,  972,  973,  976,  977,  978,  979,  981,  982,  983,  987,  990,  991,  992,  994,  995,
     1003, 1004, 1005, 1009, 1010, 1012, 1013, 1014, 1015, 1019};
 
-
-
-#endif // TC_SYNCHRONIZATION_ROWSPARITYBITSESOTERIC_HPP
