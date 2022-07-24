@@ -1,5 +1,4 @@
-#ifndef TC_SYNCHRONIZATION_LDPC_HPP
-#define TC_SYNCHRONIZATION_LDPC_HPP
+#pragma once
 
 #include <stdint.h>
 #include <cstddef>
@@ -10,7 +9,7 @@
  * LDPC encoder compliant to CCSDS specification.
  * https://public.ccsds.org/Pubs/231x0b4e0.pdf
  */
-class ldpc {
+class LDPCEncoder {
 private:
     /**
      * the number of rows with square quise-cyclic matricies in the Gnerator Matrix
@@ -76,7 +75,7 @@ public:
     /**
      * Class initialiser. Sets the output to be multiple of sizeInitialMessage
      */
-    ldpc();
+    LDPCEncoder();
 
     /**
      * The encoding of the initial message
@@ -86,9 +85,6 @@ public:
      * @param output_items The output buffer
      * @return noutput_items
      */
-    void encoder(const bool* inputMessage, bool* outputMessage);
+    void encode(const bool* inputMessage, bool* outputMessage);
 
 };
-
-
-#endif //TC_SYNCHRONIZATION_LDPC_HPP

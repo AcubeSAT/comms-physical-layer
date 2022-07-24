@@ -1,7 +1,7 @@
+#include "GMSKTranscoder.hpp"
 #include "catch2/catch_all.hpp"
-#include "gmsk.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 #define PACKET_LENGTH 100

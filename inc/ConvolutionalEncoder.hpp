@@ -1,5 +1,4 @@
-#ifndef TC_SYNCHRONIZATION_CONVOLUTIONALENCODER_HPP
-#define TC_SYNCHRONIZATION_CONVOLUTIONALENCODER_HPP
+#pragma once
 
 #include <stdint.h>
 
@@ -36,6 +35,3 @@ public:
 
     void encodeMessage(const bool*inputMessageAddress, bool* outputMessageAddress);
 };
-
-
-#endif //TC_SYNCHRONIZATION_CONVOLUTIONALENCODER_HPP

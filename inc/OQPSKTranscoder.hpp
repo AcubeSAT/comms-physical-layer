@@ -1,11 +1,9 @@
-#ifndef TC_SYNCHRONIZATION_OQPSK_H
-#define TC_SYNCHRONIZATION_OQPSK_H
+#pragma once
 
-#include <cstdint>
-#include <fm.h>
+#include "GMSKTranscoder.hpp"
+#include <FMTranscoder.hpp>
 #include <cmath>
-#include "gmsk.h"
-
+#include <cstdint>
 
 class OQPSKTranscoder {
 
@@ -34,4 +32,3 @@ public:
     void modulate(uint8_t *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal);
 
 };
-#endif //TC_SYNCHRONIZATION_OQPSK_H

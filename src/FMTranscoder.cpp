@@ -1,8 +1,8 @@
-#include "fm.h"
+#include "FMTranscoder.hpp"
+#include "filter.hpp"
 #include <algorithm>
-#include <math.h>
 #include <iostream>
-#include "filter.h"
+#include <math.h>
 
 void FMTranscoder::modulate(const double *signal, uint16_t signal_length, double *in_phase_signal,
                             double *quadrature_signal) {

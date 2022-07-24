@@ -3,34 +3,33 @@ project(tc_synchronization)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/external/etl/include")
+include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include")
 include_directories(inc)
 include_directories(src)
 
-add_subdirectory(external/etl)
+add_subdirectory(lib/etl)
 
 add_library(common OBJECT
         src/BCHDecoder.cpp
         src/ConvolutionalEncoder.cpp
-        src/oqpsk.cpp
-        src/fm.cpp
-        src/gmsk.cpp
+        src/OQPSKTranscoder.cpp
+        src/FMTranscoder.cpp
+        src/GMSKTranscoder.cpp
         src/filter.cpp
-        src/ldpc.cpp
+        src/LDPCEncoder.cpp
         )
 
 add_executable(tc_synchronization
         $<TARGET_OBJECTS:common>
         src/main.cpp
-        src/main.c
         )
 
-IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
+IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
     file(GLOB test_main_SRC "test/*.cpp")
     file(GLOB test_SRC "test/**/*.cpp")
 
-    add_subdirectory(external/Catch2)
+    add_subdirectory(lib/Catch2)
     add_executable(tests
             $<TARGET_OBJECTS:common>
             ${test_main_SRC}
@@ -38,4 +37,3 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/external/Catch2/CMakeLists.txt")
             )
     target_link_libraries(tests Catch2::Catch2WithMain)
 ENDIF ()
-
