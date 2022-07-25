@@ -6,22 +6,28 @@
 
 #define PACKET_LENGTH 100
 #define NUM_PACKETS 60
-#define PACKETS_TO_IGNORE 2
+#define MAX_SPS 10
+#define MAX_SNR 20
 
 int8_t packet[PACKET_LENGTH] = {1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0,
                                 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1};
 
 int8_t gmsk_in[NUM_PACKETS*PACKET_LENGTH] = {0};
-double gmsk_iout[10*PACKET_LENGTH*NUM_PACKETS] = {0};  // Max samples per symbol tested = 10
-double gmsk_qout[10*PACKET_LENGTH*NUM_PACKETS] = {0};
+double gmsk_iout[MAX_SPS*PACKET_LENGTH*NUM_PACKETS] = {0};
+double gmsk_qout[MAX_SPS*PACKET_LENGTH*NUM_PACKETS] = {0};
 bool demod_signal[NUM_PACKETS*PACKET_LENGTH] = {0};
+
+// BER generated from octave prototype
+double octave_ber[20] = {0.5, 0.1, 0.046109, 0.030406, 0.019704, 0.008702, 0.003401, 0.001100, 0.000500, 0.000400,
+                        0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166,
+                         0.000166};
 
 TEST_CASE("SPS = 10") {
     std::fstream berFile;
-    berFile.open("../tests/iofiles/ber.txt", std::ios::out);
+    berFile.open("../test/iofiles/ber.txt", std::ios::out);
     double ber[20];
 
-    for (int k = 0; k < 20; k++) {
+    for (int k = 0; k < MAX_SNR; k++) {
         std::string test_name = "GMSK mod/demod, SNR = " + std::to_string(k) + " dB";
 
         SECTION(test_name, "[gmskModem]") {
@@ -43,7 +49,7 @@ TEST_CASE("SPS = 10") {
 
             // Writing I/Q data to a file for plotting
             std::fstream iqFile;
-            iqFile.open("../tests/iofiles/iqFileGMSK11.txt", std::ios::out);
+            iqFile.open("../test/iofiles/iqFileGMSK.txt", std::ios::out);
             if (iqFile.is_open()) {
                 for (int i = 0; i < sps * PACKET_LENGTH * NUM_PACKETS; i++) {
                     iqFile << gmsk_iout[i] << " " << gmsk_qout[i] << " ";
@@ -94,14 +100,15 @@ TEST_CASE("SPS = 10") {
                     if (Nerrs < Nerrs_min) {
                         Nerrs_min = Nerrs;
                         Nbits_min = length;
-                        std::cout << "Shift: " << i << " |Nerrs: " << Nerrs << std::endl;
+                        std::cout << "Shift: " << i << " | Nerrs: " << Nerrs << std::endl;
                         shift=i;
                     }
 
                 }
 
                 ber[k] = (float) Nerrs_min / (float) Nbits_min;
-                CHECK(ber[k] < 0.5);
+                double error_coef = 10;
+                CHECK(ber[k] < error_coef * octave_ber[k]);
                 std::cout << "Bit Errors: " << Nerrs_min << "| BER: " << ber[k] << std::endl;
             }
         }

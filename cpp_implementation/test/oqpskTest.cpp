@@ -42,7 +42,7 @@ TEST_CASE("OQPSK Modulation: SPS = 4") {
         
         // Writing I/Q data to a file for plotting
         std::fstream iqFile;
-        iqFile.open("../tests/iofiles/iqOQPSKrep.txt", std::ios::out);
+        iqFile.open("../test/iofiles/iqOQPSKrep.txt", std::ios::out);
         if (iqFile.is_open()) {
             for (int i = 0; i < sps * PACKET_LENGTH * NUM_PACKETS; i++) {
                 iqFile << oqpsk_iout[i] << " " << oqpsk_qout[i] << " ";
@@ -65,7 +65,7 @@ TEST_CASE("OQPSK Modulation: SPS = 4") {
 
         // Writing I/Q data to a file for plotting
         std::fstream iqFile;
-        iqFile.open("../tests/iofiles/iqOQPSKrand.txt", std::ios::out);
+        iqFile.open("../test/iofiles/iqOQPSKrand.txt", std::ios::out);
         if (iqFile.is_open()) {
             for (int i = 0; i < sps * PACKET_LENGTH * NUM_PACKETS; i++) {
                 iqFile << oqpsk_iout[i] << " " << oqpsk_qout[i] << " ";
