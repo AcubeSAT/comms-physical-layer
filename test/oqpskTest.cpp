@@ -8,9 +8,9 @@
 #define NUM_PACKETS 5
 #define PACKETS_TO_IGNORE 2
 
-uint8_t oqpsk_packet[PACKET_LENGTH] = {1, 0, 1, 0, 0, 1, 0, 1};
+bool oqpsk_packet[PACKET_LENGTH] = {1, 0, 1, 0, 0, 1, 0, 1};
 
-uint8_t oqpsk_in[NUM_PACKETS*PACKET_LENGTH] = {0};
+bool oqpsk_in[NUM_PACKETS*PACKET_LENGTH] = {0};
 double oqpsk_iout[10*PACKET_LENGTH*NUM_PACKETS] = {0};  // Max samples per symbol tested = 10
 double oqpsk_qout[10*PACKET_LENGTH*NUM_PACKETS] = {0};
 bool demod_oqpsk_signal[NUM_PACKETS*PACKET_LENGTH] = {0};

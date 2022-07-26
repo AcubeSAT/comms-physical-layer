@@ -14,12 +14,12 @@ void FMTranscoder::modulate(const double *signal, uint16_t signal_length, double
     // Check if pre-emphasis is applied to the signal
     if (predeEmphasis) {
         // Attenuate higher frequencies
-        filter_fir(pre_emphasis_filter, 2, signal, signal_length, in_phase_signal);
+        filterFIR(preEmphasisFilter, 2, signal, signal_length, in_phase_signal);
         // TODO: Replace this with HAL function
 
         // Normalization
         double max_el = *(std::max_element(in_phase_signal, in_phase_signal + signal_length));
-        multiply_vec(in_phase_signal, signal_length, 1.0 / max_el);
+        multiplyVector(in_phase_signal, signal_length, 1.0 / max_el);
     }
 
     double phase = 0;

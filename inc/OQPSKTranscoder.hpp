@@ -8,27 +8,27 @@
 class OQPSKTranscoder {
 
 private:
-    double internal_buffer_in_phase[60000]; // TODO: Determine size (signal_length * max_samples_per_symbol)
-    double internal_buffer_quadrature[60000];
-    uint32_t sampling_frequency;
-    uint32_t symbol_rate;
+    double internalBufferInPhase[60000]; // TODO: Determine size (signal_length * maxSamplesPerSymbol)
+    double internalBufferQuadrature[60000];
+    uint32_t samplingFrequency;
+    uint32_t symbolRate;
     uint32_t samples;
-    uint8_t bits_per_sample = 2;
-    uint32_t samples_per_symbol;
-    uint32_t max_frequency;
-    uint32_t max_deviation;
-    FMTranscoder fm_transcoder;
-    double internal_buffer[1 << 12]; // TODO: Determine size (signal_length * max_samples_per_symbol)
+    uint8_t bitsPerSample = 2;
+    uint32_t samplesPerSymbol;
+    uint32_t maxFrequency;
+    uint32_t maxDeviation;
+    FMTranscoder fmTranscoder;
+    double internalBuffer[1 << 12]; // TODO: Determine size (signal_length * maxSamplesPerSymbol)
 
 public:
-    OQPSKTranscoder(uint32_t sampling_frequency, uint32_t symbol_rate):sampling_frequency(sampling_frequency), symbol_rate(symbol_rate),
-                                          fm_transcoder(FMTranscoder(sampling_frequency, symbol_rate / 2, 0,
-                                                                     symbol_rate / 4, 0, 0)) {
-        samples_per_symbol = sampling_frequency/symbol_rate; // samples_per_symbol and samples_per_symbol/2 must be integer values - throw error?
-        max_frequency = symbol_rate / 2;
-        max_deviation = symbol_rate / 4;
+    OQPSKTranscoder(uint32_t samplingFrequency, uint32_t symbolRate):samplingFrequency(samplingFrequency), symbolRate(symbolRate),
+                                          fmTranscoder(FMTranscoder(samplingFrequency, symbolRate / 2, 0,
+                                                                     symbolRate / 4, 0, 0)) {
+        samplesPerSymbol = samplingFrequency/symbolRate; // samplesPerSymbol and samplesPerSymbol/2 must be integer values - throw error?
+        maxFrequency = symbolRate / 2;
+        maxDeviation = symbolRate / 4;
     }
 
-    void modulate(uint8_t *signal, uint16_t signal_length, double *in_phase_signal, double *quadrature_signal);
+    void modulate(bool *signal, uint16_t signalLength, double *inPhaseSignal, double *quadratureSignal);
 
 };

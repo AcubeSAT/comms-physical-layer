@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.18)
-project(tc_synchronization)
+project(physical_layer)
 
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include")
 include_directories(inc)
-include_directories(src)
 
 add_subdirectory(lib/etl)
 
@@ -19,7 +18,7 @@ add_library(common OBJECT
         src/LDPCEncoder.cpp
         )
 
-add_executable(tc_synchronization
+add_executable(physical_layer
         $<TARGET_OBJECTS:common>
         src/main.cpp
         )

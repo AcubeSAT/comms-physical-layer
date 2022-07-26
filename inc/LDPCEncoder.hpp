@@ -12,12 +12,12 @@
 class LDPCEncoder {
 private:
     /**
-     * the number of rows with square quise-cyclic matricies in the Gnerator Matrix
+     * the number of rows with square quasi-cyclic matrices in the Generator Matrix
      */
     static const uint8_t generatorRows = 32;
 
     /**
-     * the number of columns with square quisi-cyclic matricies in the Generator Matrix
+     * the number of columns with square quasi-cyclic matrices in the Generator Matrix
      */
     static const uint8_t generatorColumns = 8;
 

@@ -9,10 +9,10 @@
 #define MAX_SPS 10
 #define MAX_SNR 20
 
-int8_t packet[PACKET_LENGTH] = {1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0,
+bool packet[PACKET_LENGTH] = {1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0,
                                 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1};
 
-int8_t gmsk_in[NUM_PACKETS*PACKET_LENGTH] = {0};
+bool gmsk_in[NUM_PACKETS*PACKET_LENGTH] = {0};
 double gmsk_iout[MAX_SPS*PACKET_LENGTH*NUM_PACKETS] = {0};
 double gmsk_qout[MAX_SPS*PACKET_LENGTH*NUM_PACKETS] = {0};
 bool demod_signal[NUM_PACKETS*PACKET_LENGTH] = {0};
