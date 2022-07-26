@@ -12,33 +12,33 @@ private:
     uint32_t basebandFrequency;
     bool predeEmphasis;
     bool limitDeltaPhase;
-    double pre_emphasis_filter[2];
+    double preEmphasisFilter[2];
 
 public:
     /**
      *
-     * @param max_modulating_frequency  Highest frequency component present in the modulated signal
-     * @param max_deviation     Maximum deviation from the carrier frequency
-     * @param pre_de_emphasis   Defines whether pre- and de-emphasis filters of high frequencies is applied
+     * @param maxModulatingFrequency  Highest frequency component present in the modulated signal
+     * @param maxDeviation     Maximum deviation from the carrier frequency
+     * @param preDeEmphasis   Defines whether pre- and de-emphasis filters of high frequencies is applied
      */
-    FMTranscoder(uint32_t sampling_frequency, uint32_t max_modulating_frequency, uint32_t baseband_frequency,
-                 uint16_t max_deviation, bool pre_de_emphasis, bool limit_delta_phase) : samplingFrequency(
-            sampling_frequency),
+    FMTranscoder(uint32_t samplingFrequency, uint32_t maxModulatingFrequency, uint32_t basebandFrequency,
+                 uint16_t maxDeviation, bool preDeEmphasis, bool limitDeltaPhase) : samplingFrequency(
+            samplingFrequency),
                                                                                          maxModulatingFrequency(
-                                                                                                 max_modulating_frequency),
-                                                                                         maxDeviation(max_deviation),
-                                                                                         predeEmphasis(pre_de_emphasis),
+                                                                                                 maxModulatingFrequency),
+                                                                                         maxDeviation(maxDeviation),
+                                                                                         predeEmphasis(preDeEmphasis),
                                                                                          basebandFrequency(
-                                                                                                 baseband_frequency),
+                                                                                                 basebandFrequency),
                                                                                          limitDeltaPhase(
-                                                                                                 limit_delta_phase) {
+                                                                                                 limitDeltaPhase) {
         // Estimate bandwidth using Carlson's rule
         bandwidth = 2 * (maxModulatingFrequency + maxDeviation);
 
         // Initialize pre-emphasis filter taps
-        pre_emphasis_filter[0] = 1.0;
-        const double time_const_cutoff = 50e-6; // τ = 50µs in Europe
-        pre_emphasis_filter[1] = -(1.0 - 1.0 / (time_const_cutoff * sampling_frequency));
+        preEmphasisFilter[0] = 1.0;
+        const double timeConstCutoff = 50e-6; // τ = 50µs in Europe
+        preEmphasisFilter[1] = -(1.0 - 1.0 / (timeConstCutoff * samplingFrequency));
         centralFrequency = (2.0 * maxModulatingFrequency) / samplingFrequency;
     };
 

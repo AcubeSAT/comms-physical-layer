@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 
-double gmsk_mod_coeff[] = {    // TODO: Correct Gaussian filter taps for BTs = 0.25
+double gmskModulationCoefficients[] = {    // TODO: Correct Gaussian filter taps for BTs = 0.25
         0.00012196358875371516, 0.0003575949085643515, 0.0007969101279741153, 0.00158733366697561,
         0.0029597436514450237, 0.005259322046185844, 0.008977695411886089, 0.01477996823086869,
         0.023517398207332008, 0.03621464785828721, 0.053899076432571746, 0.07776153780287132,
@@ -18,7 +18,7 @@ double gmsk_mod_coeff[] = {    // TODO: Correct Gaussian filter taps for BTs = 0
         0.0016482547689520288,0.0008578312299505342, 0.00041851601054077037, 0.00018288469073013403,
         6.092110197641887e-05};
 
-double gmsk_mod_coeff2[] = {   // Hardcoded BTs = 0.5, Rowetel
+double gmskModulationCoefficients2[] = {   // Hardcoded BTs = 0.5, Rowetel
     6.455906007234699e-014, 1.037067381285011e-012, 1.444835156335346e-011,
     1.745786683011439e-010, 1.829471305298363e-009, 1.662729407135958e-008,
     1.310626978701910e-007, 8.959797186410516e-007, 5.312253663302771e-006,
@@ -34,7 +34,7 @@ double gmsk_mod_coeff2[] = {   // Hardcoded BTs = 0.5, Rowetel
     1.829471305298363e-009, 1.745786683011426e-010, 1.444835156335356e-011,
     1.037067381285011e-012, 6.455906007234699e-014};
 
-double gmsk_demod_coeff[] = {
+double gmskDemodulationCoefficients[] = {
         -0.000153959924563, 0.000000000000000, 0.000167227768379, 0.000341615513437,
         0.000513334449696, 0.000667493753523, 0.000783901543032, 0.000838293462576,
         0.000805143268199, 0.000661865814384, 0.000393913058926, -0.000000000000000,
@@ -63,21 +63,21 @@ double gmsk_demod_coeff[] = {
         0.000167227768379, 0.000000000000000, -0.000153959924563
 };
 
-void GMSKTranscoder::modulate(int8_t *signal, uint16_t signal_length, double *in_phase_signal,
-                              double *quadrature_signal) {
+void GMSKTranscoder::modulate(bool *signal, uint16_t signalLength, double *inPhaseSignal,
+                              double *quadratureSignal) {
 
-    uint16_t samples_n = samples_per_symbol * signal_length;
+    uint16_t samplesN = samplesPerSymbol * signalLength;
 
-    internal_buffer_quadrature[0] = (signal[0]+1)%2;
-    for (uint16_t i = 0; i < signal_length-1; i++){
-        internal_buffer_quadrature[i+1] = (signal[i+1]+signal[i] + i+1)%2;
+    internalBufferQuadrature[0] = (signal[0]+1)%2;
+    for (uint16_t i = 0; i < signalLength - 1; i++){
+        internalBufferQuadrature[i+1] = (signal[i+1]+signal[i] + i+1)%2;
     }
 
     // NRZ encoding
-    for (uint16_t i = 0; i < signal_length; i++) {
+    for (uint16_t i = 0; i < signalLength; i++) {
         // TODO: HAL implementation
-        for (uint16_t j = 0; j < samples_per_symbol; j++) {
-            internal_buffer_in_phase[i * samples_per_symbol + j] = -1 + 2 * (internal_buffer_quadrature[i]);
+        for (uint16_t j = 0; j < samplesPerSymbol; j++) {
+            internalBufferInPhase[i * samplesPerSymbol + j] = -1 + 2 * (internalBufferQuadrature[i]);
         }
     }
 
@@ -85,90 +85,90 @@ void GMSKTranscoder::modulate(int8_t *signal, uint16_t signal_length, double *in
     uint16_t s = 41;
 
     // Filter matching
-    filter_fir(gmsk_mod_coeff2, s, internal_buffer_in_phase, samples_n, internal_buffer_quadrature);
+    filterFIR(gmskModulationCoefficients2, s, internalBufferInPhase, samplesN, internalBufferQuadrature);
 
     // FM Modulator
-    fm_transcoder.modulate(internal_buffer_quadrature, samples_n, in_phase_signal, quadrature_signal);
+    fmTranscoder.modulate(internalBufferQuadrature, samplesN, inPhaseSignal, quadratureSignal);
 }
 
-void GMSKTranscoder::demodulate(double *input_in_phase_signal, double *input_quadrature_signal, uint16_t signal_length,
+void GMSKTranscoder::demodulate(double *inputInPhaseSignal, double *inputQuadratureSignal, uint16_t signalLength,
                                 bool *signal) {
 
-    uint16_t symbols_n = floor(signal_length / samples_per_symbol);
-    float frequency_deviation_component = 2 * M_PI * max_deviation / sampling_frequency;
+    uint16_t symbolsN = floor(signalLength / samplesPerSymbol);
+    float frequency_deviation_component = 2 * M_PI * maxDeviation / samplingFrequency;
     double rx_int[2 << 12] = {0};
     int numtaps = 41;
 
     // Add Wiener Filter for equalisation (Convolution with the gaussian filter)
     if(equalize){
-        filter_fir(delayed_taps, 6 * samples_per_symbol, gmsk_mod_coeff2, numtaps, convolved_filters);
+        filterFIR(delayedTaps, 6 * samplesPerSymbol, gmskModulationCoefficients2, numtaps, convolvedFilters);
 
-        filter_fir(convolved_filters, numtaps, input_in_phase_signal, signal_length, internal_buffer_in_phase);
-        filter_fir(convolved_filters, numtaps, input_quadrature_signal, signal_length, internal_buffer_quadrature);
+        filterFIR(convolvedFilters, numtaps, inputInPhaseSignal, signalLength, internalBufferInPhase);
+        filterFIR(convolvedFilters, numtaps, inputQuadratureSignal, signalLength, internalBufferQuadrature);
     }
     else {
-        filter_fir(gmsk_mod_coeff2, numtaps, input_in_phase_signal, signal_length, internal_buffer_in_phase);
-        filter_fir(gmsk_mod_coeff2, numtaps, input_quadrature_signal, signal_length, internal_buffer_quadrature);
+        filterFIR(gmskModulationCoefficients2, numtaps, inputInPhaseSignal, signalLength, internalBufferInPhase);
+        filterFIR(gmskModulationCoefficients2, numtaps, inputQuadratureSignal, signalLength, internalBufferQuadrature);
     }
 
-    integrate(internal_buffer_in_phase, signal_length, 2*samples_per_symbol, input_in_phase_signal);
-    integrate(internal_buffer_quadrature, signal_length, 2*samples_per_symbol, input_quadrature_signal);
+    integrate(internalBufferInPhase, signalLength, 2 * samplesPerSymbol, inputInPhaseSignal);
+    integrate(internalBufferQuadrature, signalLength, 2 * samplesPerSymbol, inputQuadratureSignal);
 
     // Implement PLL
     double dco = 0;
     double lower = 0;
-    double loop_filt = 0;
-    double phase_error = 0;
-    double timing_clock_phase = 0;
-    uint16_t timing_window = 10*samples_per_symbol; // TODO: 200*samples_per_symbol;
-    double timing_angle = 0;
-    double* timing_angle_log = internal_buffer_in_phase;
-    double* toff = internal_buffer_quadrature;
+    double loopFilt = 0;
+    double phaseError = 0;
+    double timingClockPhase = 0;
+    uint16_t timingWindow = 10*samplesPerSymbol; // TODO: 200*samplesPerSymbol;
+    double timingAngle = 0;
+    double* timingAngleLog = internalBufferInPhase;
+    double* toff = internalBufferQuadrature;
 
     double temp;
 
-    for (uint16_t i; i < signal_length; i++){
-        if (i > 1 && (i+1) % timing_window == 0){
-            double i_clock_phase = 0;
-            double q_clock_phase = 0;
-            for (uint16_t j = i - timing_window + 1; j <= i; j++){
-                i_clock_phase += fabs(input_in_phase_signal[j])*cos((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
-                q_clock_phase -= fabs(input_in_phase_signal[j])*sin((j+1)*2*M_PI*(symbol_rate/2.0)/sampling_frequency);
+    for (uint16_t i; i < signalLength; i++){
+        if (i > 1 && (i+1) % timingWindow == 0){
+            double iClockPhase = 0;
+            double qClockPhase = 0;
+            for (uint16_t j = i - timingWindow + 1; j <= i; j++){
+                iClockPhase += fabs(inputInPhaseSignal[j]) * cos((j + 1) * 2 * M_PI * (symbolRate / 2.0) / samplingFrequency);
+                qClockPhase -= fabs(inputInPhaseSignal[j]) * sin((j + 1) * 2 * M_PI * (symbolRate / 2.0) / samplingFrequency);
                 }
-            timing_angle = atan2(q_clock_phase, i_clock_phase);
-            timing_clock_phase = timing_angle;
+            timingAngle = atan2(qClockPhase, iClockPhase);
+            timingClockPhase = timingAngle;
         } else{
-            timing_clock_phase += 2.0*M_PI/(2*samples_per_symbol);
+            timingClockPhase += 2.0*M_PI/(2*samplesPerSymbol);
         }
-        timing_angle_log[i] = timing_angle;
+        timingAngleLog[i] = timingAngle;
 
-        temp = input_in_phase_signal[i]*cos(dco) + input_quadrature_signal[i]*sin(dco);
-        input_quadrature_signal[i] = -input_in_phase_signal[i]*sin(dco) + cos(dco)*input_quadrature_signal[i];
-        input_in_phase_signal[i] = temp;
-        phase_error = (-1+2*signs(input_in_phase_signal[i]*input_quadrature_signal[i]))*cos(timing_clock_phase);
-        lower = pll_params.G2*phase_error + lower;
-        loop_filt = pll_params.G1*phase_error + lower;
-        dco = dco + loop_filt;
+        temp = inputInPhaseSignal[i] * cos(dco) + inputQuadratureSignal[i] * sin(dco);
+        inputQuadratureSignal[i] = -inputInPhaseSignal[i] * sin(dco) + cos(dco) * inputQuadratureSignal[i];
+        inputInPhaseSignal[i] = temp;
+        phaseError = (-1+2*signs(inputInPhaseSignal[i] * inputQuadratureSignal[i])) * cos(timingClockPhase);
+        lower = pllParams.G2*phaseError + lower;
+        loopFilt = pllParams.G1*phaseError + lower;
+        dco = dco + loopFilt;
     }
 
-    toff[0] = floor(timing_angle_log[0] + 0.5);
-    for (uint16_t i = 1; i < signal_length; i++){
+    toff[0] = floor(timingAngleLog[0] + 0.5);
+    for (uint16_t i = 1; i < signalLength; i++){
         // The difference of of consecutive angles must be smaller than π
-        toff[i] = floor(timing_angle_log[i - 1] + M_PI * floor((timing_angle_log[i] - timing_angle_log[i - 1]) / M_PI) + 0.5);
+        toff[i] = floor(timingAngleLog[i - 1] + M_PI * floor((timingAngleLog[i] - timingAngleLog[i - 1]) / M_PI) + 0.5);
     }
     
     uint16_t k = 0;
-    for (uint16_t i = 2*samples_per_symbol; i < signal_length; i += 2*samples_per_symbol){
-        if ((i - toff[i] + samples_per_symbol) < signal_length) {
-            input_in_phase_signal[k] = input_in_phase_signal[i - static_cast<int16_t>(toff[i])];
-            input_quadrature_signal[k] = input_quadrature_signal[i - static_cast<int16_t>(toff[i]) + samples_per_symbol];
+    for (uint16_t i = 2*samplesPerSymbol; i < signalLength; i += 2 * samplesPerSymbol){
+        if ((i - toff[i] + samplesPerSymbol) < signalLength) {
+            inputInPhaseSignal[k] = inputInPhaseSignal[i - static_cast<int16_t>(toff[i])];
+            inputQuadratureSignal[k] = inputQuadratureSignal[i - static_cast<int16_t>(toff[i]) + samplesPerSymbol];
         }
         k += 1;
     }
 
-    for (uint16_t i = 0; i < symbols_n/2; i++){
-        signal[2*i] = input_in_phase_signal[i] > 0;
-        signal[2*i+1] = input_quadrature_signal[i] > 0;
+    for (uint16_t i = 0; i < symbolsN/2; i++){
+        signal[2*i] = inputInPhaseSignal[i] > 0;
+        signal[2*i+1] = inputQuadratureSignal[i] > 0;
     }
 
 }

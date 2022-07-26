@@ -1,4 +1,4 @@
-# TC Synchronization
+# Physical Layer
 
 * GMSK Prototypes
     * Modulation 
@@ -6,6 +6,10 @@
     * Symbol synchronization
     * Frame detection
     * Channel Impaiments
+* OQPSK Modulation
+* BCH Decoder
+* LDPC Encoder
+* Convolutional Encoder
 
 The files contained in the `octave/` folder are part of the [codec2 low bit rate speech decoder](https://github.com/drowe67/codec2). All of the functions are copied from the [fm.m](https://github.com/drowe67/codec2/blob/master/octave/fm.m) and [gmsk.m](https://github.com/drowe67/codec2/blob/master/octave/gmsk.m) files of the project and are separated into distinct files. They are used for GMSK encoding and decoding as well as testing and plotting.
 
