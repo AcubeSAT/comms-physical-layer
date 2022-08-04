@@ -20,7 +20,6 @@ protected:
      * @param decodedCodewordLength The length of the encoded codeword
      */
     static const uint16_t encodedCodewordLength = 4096;
-    bool encodedMessage[encodedCodewordLength]{};
 
 public:
     uint16_t inputItemsNumber;
@@ -33,5 +32,5 @@ public:
      */
     ~ConvolutionalEncoder();
 
-    void encodeMessage(const bool*inputMessageAddress, bool* outputMessageAddress);
+    void encodeMessage(const bool* const inputMessageAddress, bool* const outputMessageAddress);
 };
