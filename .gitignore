@@ -49,9 +49,12 @@ __pycache__
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/tc_synchronization.iml
+.idea/vcs.xml
 
 # Generated files
 .idea/**/contentModel.xml
+test/iofiles/out*
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
