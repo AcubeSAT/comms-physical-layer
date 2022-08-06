@@ -2,7 +2,7 @@
 #include "catch2/catch_all.hpp"
 #include <fstream>
 
-TEST_CASE("Encoder Works") {
+TEST_CASE("Convolutional Encoder Works") {
     ConvolutionalEncoder convolutional;
     const uint wordSize = 2048;
     bool src[wordSize];
@@ -24,13 +24,13 @@ TEST_CASE("Encoder Works") {
         CHECK(errors == 0);
     }
     SECTION("Random Word") {
-        std::ifstream srcFile("../test/data/convolutional_src_data");
+        std::ifstream srcFile("../test/iofiles/convolutional_src_data");
         for (int i = 0; i < wordSize; i++) {
             srcFile >> src[i];
         }
 
 
-        std::ifstream dstFile("../test/data/convolutional_dst_data");
+        std::ifstream dstFile("../test/iofiles/convolutional_dst_data");
         for (int i = 0; i < 2*wordSize; i++) {
             dstFile >> expectedDst[i];
         }
