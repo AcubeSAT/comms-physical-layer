@@ -3,6 +3,11 @@ software on AcubeSAT perform as intended.
 
 ## Error Correction Testing
 
+### BCH Decoding
+
+---
+```bchTest.cpp``` includes tests for the BCH decoder.
+
 ### Convolutional Encoding
 
 ---
