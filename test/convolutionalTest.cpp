@@ -4,7 +4,7 @@
 
 TEST_CASE("Convolutional Encoder Works") {
     ConvolutionalEncoder convolutional;
-    const uint wordSize = 2048;
+    constexpr uint16_t wordSize = 2048;
     bool src[wordSize];
     bool expectedDst[2*wordSize];
     bool dst[2*wordSize];
