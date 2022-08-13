@@ -1,14 +1,11 @@
 #include "LDPCEncoder.hpp"
 #include <cstdint>
+#include <etl/bitset.h>
 
 LDPCEncoder::LDPCEncoder() = default;
 
-void LDPCEncoder::encode(const bool *inputMessage, bool *outputMessage) {
-
-    bool encodedMessage[sizeEncodedMessage];
-    for (bool &i: encodedMessage) {
-        i = false;
-    }
+void LDPCEncoder::encode(const etl::bitset<inputLength>& input, etl::bitset<outputLength>& output) {
+    etl::bitset<errorCorrectionLength> errorCorrectionBits;
     for (int row = 0; row < generatorRows; row++) {
         for (int column = 0; column < generatorColumns; column++) {
             uint16_t index = row * generatorColumns + column;
@@ -28,16 +25,18 @@ void LDPCEncoder::encode(const bool *inputMessage, bool *outputMessage) {
                     if (updatedParity >= sizeSquareCyclicMatrix) {
                         updatedParity -= sizeSquareCyclicMatrix;
                     }
-                    encodedMessage[column * sizeSquareCyclicMatrix + updatedParity] ^= inputMessage[row * sizeSquareCyclicMatrix + j];
+                    uint16_t position = column * sizeSquareCyclicMatrix + updatedParity;
+                    uint8_t result = errorCorrectionBits[position] ^ input[row * sizeSquareCyclicMatrix + j];
+                    errorCorrectionBits.set(position, result);
                 }
             }
         }
     }
     for (int i = 0; i < encodingIterations; i++) {
         if (i < thresholdIndex) {
-            outputMessage[i] = inputMessage[i];
+            output.set(i, input[i]);
         } else {
-            outputMessage[i] = encodedMessage[i - 4096];
+            output.set(i, errorCorrectionBits[i - 4096]);
         }
     }
 }

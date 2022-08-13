@@ -1,12 +1,53 @@
 
 This repository contains the Physical and Coding Layer as defined in the CCSDS Layered model. More specifically, this implements:
 
-* Pre-coded GMSK Modulation (CCSDS 413.0-G-3)
 * Pre-coded GMSK Modulation ([CCSDS 413.0-G-3](https://public.ccsds.org/Pubs/413x0g3e1.pdf))
 * OQPSK Modulation ([CCSDS 413.0-G-3](https://public.ccsds.org/Pubs/413x0g3e1.pdf))
 * BCH Decoder ([CCSDS 231.0-B-4](https://public.ccsds.org/Pubs/231x0b4e0.pdf))
 * LDPC Encoder ([CCSDS 130.1-G-3](https://public.ccsds.org/Pubs/130x1g3.pdf))
 * Convolutional Encoder ([CCSDS 130.1-G-3](https://public.ccsds.org/Pubs/130x1g3.pdf))
+
+## Error Correction Codes
+
+### Convolutional Encoder 
+
+The [CCSDS 130.1-G-3](https://public.ccsds.org/Pubs/130x1g3.pdf) (7,1/2) Convolutional Encoder (meaning rate r = 1/2 and constraint length k = 7) is implemented. 
+The Convolutional Encoder is shown in the image below. 
+It consists of a shift register and some exclusive OR gates that implement the two parity checks. 
+Preceding bits are considered to be 0.
+![convolutional encoder](/media/convolutionalEncoder.png "The Convolutional Encoder")
+
+#### Class Definition
+ 
+The encoder is defined in ```inc/Convolutional.hpp```
+
+#### Methods
+
+```cpp
+void encode(const etl::bitset<inputLength>& input, etl::bitset<outputLength>& output);
+```
+
+* ```input``` : Provide the input to the encoder in the form of a reference to an etl::bitset of size ```inputLength```
+* ```output``` : Provide the input to the encoder in the form of a reference to an etl::bitset of size ```outputLength```
+
+### LDPC Encoder
+
+The [CCSDS 130.1-G-3](https://public.ccsds.org/Pubs/130x1g3.pdf) LDPC Encoder at rate of r = 4/5 with information block length k = 4096 (encoded size is then 5120) is implemented.
+
+#### Class Definition
+
+The encoder is defined in ```inc/LDPCEncoder.hpp```. ```inc/PostionRowsEsoteric.hpp``` and ```inc\RowsParityBitsEsoteric.hpp``` are also used in the implementation.
+
+#### Methods
+
+```cpp
+void encode(const etl::bitset<inputLength>& input, etl::bitset<outputLength>& output);
+```
+
+* ```input``` : Provide the input to the encoder in the form of a reference to an etl::bitset of size ```inputLength```
+* ```output``` : Provide the input to the encoder in the form of a reference to an etl::bitset of size ```outputLength```
+
+## Modulations
 
 The GMSK and OQPSK modulation were mostly ported to C++ from the [codec2](https://github.com/drowe67/codec2) project by [Rowetel](https://www.rowetel.com/).
 

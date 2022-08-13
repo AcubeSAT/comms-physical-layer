@@ -6,8 +6,7 @@ static constexpr uint8_t generatorRowsEsoteric = 32;
 
 static constexpr uint8_t generatorColumnsEsoteric = 8;
 
-static constexpr int totalQuasiCyclicMatricesEsoteric = generatorColumnsEsoteric * generatorRowsEsoteric;
-
+static constexpr uint16_t totalQuasiCyclicMatricesEsoteric = generatorColumnsEsoteric * generatorRowsEsoteric;
 
 inline static const uint16_t positionRowsEsoteric[totalQuasiCyclicMatricesEsoteric] = {
     0,     63,    128,   194,   266,   336,   388,   444,   508,   572,   639,   708,   764,

@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <cstddef>
+#include "etl/bitset.h"
 #include "PositionRowsEsoteric.hpp"
 #include "RowsParityBitsEsoteric.hpp"
 
@@ -10,24 +11,21 @@
  * https://public.ccsds.org/Pubs/231x0b4e0.pdf
  */
 class LDPCEncoder {
-private:
+    public:
     /**
      * the number of rows with square quasi-cyclic matrices in the Generator Matrix
      */
-    static const uint8_t generatorRows = 32;
-
+    static constexpr uint8_t generatorRows = 32;
     /**
      * the number of columns with square quasi-cyclic matrices in the Generator Matrix
      */
-    static const uint8_t generatorColumns = 8;
-
+    static constexpr uint8_t generatorColumns = 8;
     /**
      * the size of each square quasi-cyclic matrix
      */
-    static const uint8_t sizeSquareCyclicMatrix = 128;
+    static constexpr uint8_t sizeSquareCyclicMatrix = 128;
 
-    static const uint16_t sizeParity = 16362;
-
+    static constexpr uint16_t sizeParity = 16362;
     /**
      * the position of the Parity Bits in the Generator Matrix (Identity matrix excluded). Since the Generator Matrix
      * consists of square cyclic block matrices, only the parities in the first line of each sub-matrix have been kept
@@ -36,55 +34,39 @@ private:
     /**
      * the total number of square quasi-cyclic matrices starting from 0
      */
-    static const int totalQuasiCyclicMatrices = generatorColumns * generatorRows;
-
+    static constexpr uint16_t totalQuasiCyclicMatrices = generatorColumns * generatorRows;
     /**
      * the positions in vector rowsParityBits where the parities belong to a new block matrix.
      */
-
     inline static const uint16_t* positionRows = positionRowsEsoteric;
-
     /**
      * size of the initial message
      */
-    static const int sizeInitialMessage = 4096;
-
+    static constexpr uint16_t inputLength = 4096;
     /**
-     * size of the encoded message.
+     * number of Error Correction bits which will be appended to the input.
      */
-    static const int sizeEncodedMessage = generatorColumns * sizeSquareCyclicMatrix;
-
+    static constexpr uint16_t errorCorrectionLength = generatorColumns * sizeSquareCyclicMatrix;
     /**
      * size of the full message that will be transited consisting of the initial message and the encoded message
      */
-    static const int sizeMessage = sizeInitialMessage + sizeEncodedMessage;
-
+    static constexpr uint16_t outputLength = inputLength + errorCorrectionLength;
     /**
      * number of iterations in the loop applying the encoding on the data
      */
-     static constexpr size_t encodingIterations = 5120;
-
-     /**
-      * number of indices, in which the output is just the input
-      */
-     static constexpr size_t thresholdIndex = 4096;
-
-
-public:
-
+    static constexpr size_t encodingIterations = 5120;
     /**
-     * Class initialiser. Sets the output to be multiple of sizeInitialMessage
+     * number of indices, in which the output is just the input
+     */
+    static constexpr size_t thresholdIndex = 4096;
+    /**
+     * Class initializer. Sets the output to be multiple of inputLength
      */
     LDPCEncoder();
-
     /**
-     * The encoding of the initial message
-     * @param noutput_items The number of output bits
-     * @param ninput_items The number of input bits on each port
-     * @param input_items The input buffer
-     * @param output_items The output buffer
-     * @return noutput_items
+     * The encoding method
+     * @param input Reference to bit packed byte-encoded data (etl::<bitset>) of size inputLength
+     * @param output Reference to bit packed byte-encoded data (etl::<bitset>) of size outputLength
      */
-    void encode(const bool* inputMessage, bool* outputMessage);
-
+    void encode(const etl::bitset<inputLength>& input, etl::bitset<outputLength>& output);
 };
