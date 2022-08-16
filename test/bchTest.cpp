@@ -19,21 +19,21 @@ TEST_CASE("BCH decoder - Fixed words") {
         auto resultData = decoder.decodeBCH(data);
         REQUIRE(resultData.has_value());
         constexpr uint64_t expectedResult = 0b10101010101010101010101010101010101010101010101010101010;
-        CHECK((resultData.value() >> 8) == expectedResult);
+        CHECK(resultData.value() == expectedResult);
     }
     SECTION("BCH-Test no2: Another word with 1 error - Decoder succeeds") {
         uint64_t data = 0b1011101010101010101010101010101010101010101010101010101001010000;
         auto resultData = decoder.decodeBCH(data);
         constexpr uint64_t expectedResult = 0b10101010101010101010101010101010101010101010101010101010;
         REQUIRE(resultData.has_value());
-        CHECK((resultData.value() >> 8) == expectedResult);
+        CHECK(resultData.value() == expectedResult);
     }
     SECTION("BCH-Test no3: Word with no errors - Decoder succeeds") {
         uint64_t data = 0b1010101010101010101010101010101010101010101010101010101001010000;
         auto resultData = decoder.decodeBCH(data);
         REQUIRE(resultData.has_value());
         constexpr uint64_t expectedResult = 0b10101010101010101010101010101010101010101010101010101010;
-        CHECK((resultData.value() >> 8) == expectedResult);
+        CHECK(resultData.value() == expectedResult);
     }
     SECTION("BCH-Test no4: Word with 2 errors - Decoder fails") {
         uint64_t data = 0b1111101010101010101010101010101010101010101010101010101001010000;

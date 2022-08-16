@@ -1,8 +1,6 @@
 #include "BCHDecoder.hpp"
+#include "etl/bit.h"
 
-BCHDecoder::BCHDecoder(){}
-
-BCHDecoder::~BCHDecoder(){}
 
 etl::pair<uint64_t, uint64_t> BCHDecoder::binaryPolynomialDivision(uint64_t dividend, uint64_t divisor) {
     if (divisor == 0) {
@@ -12,8 +10,8 @@ etl::pair<uint64_t, uint64_t> BCHDecoder::binaryPolynomialDivision(uint64_t divi
         return {0, divisor};
     }
 
-    uint64_t dividendDegree = static_cast<uint64_t>(floor(log2(dividend))) + 1;
-    uint64_t divisorDegree = static_cast<uint64_t>(floor(log2(divisor))) + 1;
+    uint64_t dividendDegree = etl::bit_width(dividend);
+    uint64_t divisorDegree = etl::bit_width(divisor);
     size_t bitPosition = 0;
     uint64_t quotient = 0;
     while (dividend >= divisor) {
@@ -46,14 +44,14 @@ etl::pair<uint64_t, uint64_t> BCHDecoder::calculateSyndromes(uint64_t receivedMe
     return {syndrome1, syndrome2};
 }
 
-std::optional<uint64_t> BCHDecoder::decodeBCH(uint64_t codeword) {
+[[nodiscard]] etl::optional<uint64_t> BCHDecoder::decodeBCH(uint64_t codeword) {
     uint64_t syndrome1 = calculateSyndromes(codeword).first;
     if (syndrome1 == 0) {
-        return codeword;
+        return codeword >> parityAndDummyBits;
     } else if (syndromesHash.contains(syndrome1)) {
         uint64_t const exponentOfTwo = 63 - syndromesHash.at(syndrome1) - 1;
         codeword ^= UINT64_C(1) << exponentOfTwo;
-        return codeword;
+        return codeword >> parityAndDummyBits;
     }
     return {};
 }

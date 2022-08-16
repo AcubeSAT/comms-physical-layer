@@ -1,14 +1,14 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 #include "etl/map.h"
+#include "etl/optional.h"
 
 class BCHDecoder {
 
 public:
-    BCHDecoder();
-    ~BCHDecoder();
+    BCHDecoder() { }
+    ~BCHDecoder() { }
 
     /**
      * @param generatorPolynomial The generator polynomial g(x) = x^7 + x^6 + x^2 + 1
@@ -19,8 +19,9 @@ public:
      * https://public.ccsds.org/Pubs/231x0b4e0.pdf
      * CCSDS spec defines a BCH(63,56) ECC algorithm
      */
-    static constexpr uint64_t n = 63;
-    static constexpr uint64_t k = 56;
+    static constexpr uint8_t n = 63;
+    static constexpr uint8_t k = 56;
+    static constexpr uint8_t parityAndDummyBits = 8;
 
     /**
      * @param primitiveElements The lookup table used to speed up the calculation of the syndromes
@@ -71,9 +72,8 @@ public:
      * one errors, it can't decode the codeword.
      * error correction code.
      * @param codeword The binary word to be decoded
-     * @return The decoded message in case of a valid codeword, or a nullopt_t object otherwise
+     * @return The decoded message in case of a valid codeword, or an empty variant object otherwise
      */
-    std::optional<uint64_t> decodeBCH(uint64_t codeword);
-
+    [[nodiscard]] etl::optional<uint64_t> decodeBCH(uint64_t codeword);
 };
 
