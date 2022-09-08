@@ -4,7 +4,7 @@
 #include <iostream>
 
 template <int samplesPerSymbol>
-void GMSKTranscoder<samplesPerSymbol>::modulate(bool *signal, uint16_t signalLength, double *inPhaseSignal,
+void GMSKTranscoder<samplesPerSymbol>::modulate(const bool *signal, uint16_t signalLength, double *inPhaseSignal,
                               double *quadratureSignal) {
 
     uint16_t samplesN = samplesPerSymbol * signalLength;
@@ -95,7 +95,7 @@ void GMSKTranscoder<samplesPerSymbol>::demodulate(double *inputInPhaseSignal, do
 
     toff[0] = floor(timingAngleLog[0] + 0.5);
     for (uint16_t i = 1; i < signalLength; i++){
-        // The difference of of consecutive angles must be smaller than π
+        // The difference of consecutive angles must be smaller than π
         toff[i] = floor(timingAngleLog[i - 1] + M_PI * floor((timingAngleLog[i] - timingAngleLog[i - 1]) / M_PI) + 0.5);
     }
     

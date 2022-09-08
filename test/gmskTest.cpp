@@ -105,7 +105,7 @@ TEST_CASE("GMSK: SPS = 10") {
                 }
 
                 ber[k] = minimumErrorCount / static_cast<float>(minimumBitCount);
-                const double ErrorCoef = 6;
+                const double ErrorCoef = 10;
                 CHECK(ber[k] < ErrorCoef * testBER[k]);
                 std::cout << "Bit Errors: " << minimumErrorCount << "| BER: " << ber[k] << std::endl;
             }
@@ -200,7 +200,7 @@ TEST_CASE("GMSK: SPS = 6") {
                 }
 
                 ber[k] = minimumErrorCount / static_cast<float>(minimumBitCount);
-                const double ErrorCoef = 6;
+                const double ErrorCoef = 10;
                 CHECK(ber[k] < ErrorCoef * testBER[k]);
                 std::cout << "Bit Errors: " << minimumErrorCount << "| BER: " << ber[k] << std::endl;
             }

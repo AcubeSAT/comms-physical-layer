@@ -16,10 +16,14 @@ add_library(common OBJECT
         src/GMSKTranscoder.cpp
         src/filter.cpp
         src/LDPCEncoder.cpp
+        src/Synchronizer.cpp
         )
+
+file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
 
 add_executable(physical_layer
         $<TARGET_OBJECTS:common>
+        ${x86_main_SRC}
         src/main.cpp
         )
 
@@ -32,6 +36,8 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     add_executable(tests
             $<TARGET_OBJECTS:common>
             ${test_main_SRC}
-            ${test_SRC})
+            ${x86_main_SRC}
+            ${test_SRC}
+            )
     target_link_libraries(tests Catch2::Catch2WithMain)
 ENDIF ()

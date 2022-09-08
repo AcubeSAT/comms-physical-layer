@@ -80,7 +80,7 @@ public:
     }
 
     // TODO: signal_length should be a pre-determined number
-    void modulate(bool *signal, uint16_t signalLength, double *inPhaseSignal, double *quadratureSignal);
+    void modulate(const bool *signal, uint16_t signalLength, double *inPhaseSignal, double *quadratureSignal);
 
     // Consider changing input IQ signal to const
     void

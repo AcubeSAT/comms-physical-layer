@@ -63,3 +63,15 @@ and then demodulated, for 20 different noise scenarios (SNRs). The BER is calcul
 These results match those from the octave prototype:
 
 ![GMSK Test Results](./media/GMSKOctaveBER.png "GMSK Octave BER-SNR curve")
+
+### Synchronization (GMSK Detector)
+
+---
+
+In case an ASM codeword exists encoded in the received modulated signal, the algorithm's output signal has a spike at the sample the ASM starts:
+
+![Signal with ASM](./media/CorrelationASM.png "Correlation of a signal containing an ASM")
+
+When and ASM is not present, the correlation plot does not have any distinct spikes:
+
+![Signal without ASM](./media/CorrelationNoASM.png "Correlation of a signal not containing an ASM")
