@@ -9,6 +9,34 @@ This repository contains the Physical and Coding Layer as defined in the CCSDS L
 
 ## Error Correction Codes
 
+### BCH Decoder  
+
+The [CCSDS 231.0-B-4](https://public.ccsds.org/Pubs/231x0b4e0.pdf) book defines a (63,56) modified Bose-Chaudhuri-Hocquenghem (BCH) code,
+using the following generator polynomial:  
+```math
+g(x) = x^7 + x^6 + x^2 + 1
+```
+The BCH codeword consists of three fields: 56 information bits, 7 parity bits, and 1 appended filler bit.
+![BCH codeword fields](/media/bchCodeword.png "BCH codeword")  
+The (63,56) modified BCH code generator is shown in the image below.
+During the transmission of information bits, the switch is set to position `(1)` and during the transmission of parity bits, the switch is set to position `(2)`.
+Position `(3)` is reserved for the filler bit.  
+![BCH code generator](/media/bchCodeGenerator.png "(63,56) Modified BCH Code Generator")  
+
+#### Class Definition
+
+The decoder is defined in ```inc/BCHDecoder.hpp```
+
+#### Methods
+
+```cpp
+[[nodiscard]] etl::optional<uint64_t> decodeBCH(uint64_t codeword)
+```
+
+* ```codeword``` : Provide the input to the decoder in the form of a 64bit unsigned integer
+* Returns an optional object. The optional is empty in case of an input that contains more than one mistakes. 
+Otherwise, a 64bit unsigned integer with only the 56 least significant bits occupied can be unwrapped from the returned object.
+
 ### Convolutional Encoder 
 
 The [CCSDS 130.1-G-3](https://public.ccsds.org/Pubs/130x1g3.pdf) (7,1/2) Convolutional Encoder (meaning rate r = 1/2 and constraint length k = 7) is implemented. 

@@ -9,8 +9,6 @@
  * - BCH-Test no2: Decoding another codeword with a single error successfully.
  * - BCH-Test no3: Decoding another single codeword successfully, since it doesn't contain any errors.
  * - BCH-Test no4: Decoding a word with 2 errors, decoder should return its empty variant to mark a failure.
- *
- * `resultData.value()` is shifted by 8 to the right because the value returned from the decoder is a 56 bit word.
  */
 TEST_CASE("BCH decoder - Fixed words") {
     BCHDecoder decoder { };
