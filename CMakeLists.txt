@@ -8,6 +8,8 @@ include_directories(inc)
 
 add_subdirectory(lib/etl)
 
+add_compile_options(-Wvla)
+
 add_library(common OBJECT
         src/BCHDecoder.cpp
         src/ConvolutionalEncoder.cpp
