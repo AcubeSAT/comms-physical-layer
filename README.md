@@ -1,7 +1,8 @@
 
 This repository contains the Physical and Coding Layer as defined in the CCSDS Layered model. More specifically, this implements:
 
-* Pre-coded GMSK Modulation ([CCSDS 413.0-G-3](https://public.ccsds.org/Pubs/413x0g3e1.pdf))
+* Pre-coded GMSK Modulation and Demodulation ([CCSDS 413.0-G-3](https://public.ccsds.org/Pubs/413x0g3e1.pdf))
+* GMSK Detector Algorithm ([DSLWP-B GMSK detector](https://destevez.net/2018/06/dslwp-b-gmsk-detector/))
 * OQPSK Modulation ([CCSDS 413.0-G-3](https://public.ccsds.org/Pubs/413x0g3e1.pdf))
 * BCH Decoder ([CCSDS 231.0-B-4](https://public.ccsds.org/Pubs/231x0b4e0.pdf))
 * LDPC Encoder ([CCSDS 130.1-G-3](https://public.ccsds.org/Pubs/130x1g3.pdf))
@@ -126,6 +127,8 @@ GMSKTranscoder(uint32_t sampleFrequency, uint32_t symbolRate, bool equalize)
  * `symbolRate`: Symbol rate 
  * `equalize`: Whether equalization will be used in the demodulator to offset the effects of the (non-Nyquist) Gaussian filter used in the modulator
 
+![img.png](media/GMSKModulation.png)
+
 #### Methods
 
 ```cpp
@@ -163,14 +166,41 @@ OQPSKTranscoder(uint32_t samplingFrequency, uint32_t symbolRate)
 modulate(bool *signal, uint16_t signalLength, double *inPhaseSignal, double *quadratureSignal)
 ```
 * `signal`: Pointer to the input signal to be modulated
-* `signalLength`: Input signal signal length 
+* `signalLength`: Input signal length 
 * `inPhaseSignal`: Pointer to output in-phase component 
 * `quadratureSignal`: Pointer to output quadrature component
 
+##### I/Q Plot
+![OQPSK Modulation I/Q](test/media/TestIQPlot.png)
 
 ### Synchronization
 
+The GMSK detector/synchronization algorithm used, is based on an article by [Daniel Estevez](https://destevez.net/): ["DSLWP-B GMSK detector"](https://destevez.net/2018/06/dslwp-b-gmsk-detector/)
 
-The  gmsk_protoype.py contains code that is based on the [jupyter_notebooks repository](https://github.com/daniestevez/jupyter_notebooks) and mainly on the [gmsk_dslwp.py](https://github.com/daniestevez/jupyter_notebooks/blob/master/dslwp/dslwp_gmsk.py) GMSK detector script.
+The  gmsk_detector.py contains code that is based on the [jupyter_notebooks repository](https://github.com/daniestevez/jupyter_notebooks) and mainly on the [gmsk_dslwp.py](https://github.com/daniestevez/jupyter_notebooks/blob/master/dslwp/dslwp_gmsk.py) GMSK detector script. The `Synchronizer` class is based on this implementation.
+
+
+#### Class Definition
+```cpp
+Synchronizer(int sampleFrequency, int symbolRate)
+```
+* `sampleFrequency`: Sampling frequency
+* `symbolRate`: Symbol Rate
+
+#### Methods
+```cpp
+void computeCorrelation(double *inPhaseSignal, double *quadratureSignal, int signalLength)
+```
+* `inPhaseSignal`: Pointer to input in-phase component
+* `quadratureSignal`: Pointer to input quadrature signal
+* `signalLength`: Input signal length
+
+This method takes as input the GMSK modulated received signal and calculates the acquisition matrix in `acqBuffer`. From this matrix it is possible to compute the correlation of the received signal to a synchronization marker to then conclude whether the signal contains the marker and at which sample it begins. An example is showcased in `syncTest.cpp`.
+
+If a spike exists in the correlation signal then the synchronization marker exists, and starts at the sample the spike is
+
+##### Correlation Plot
+
+![Correlation: Sync Marker exists](test/media/CorrelationASM.png)
 
 
