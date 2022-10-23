@@ -87,7 +87,7 @@ void GMSKTranscoder<samplesPerSymbol>::demodulate(double *inputInPhaseSignal, do
         temp = inputInPhaseSignal[i] * cos(dco) + inputQuadratureSignal[i] * sin(dco);
         inputQuadratureSignal[i] = -inputInPhaseSignal[i] * sin(dco) + cos(dco) * inputQuadratureSignal[i];
         inputInPhaseSignal[i] = temp;
-        phaseError = (-1+2*signs(inputInPhaseSignal[i] * inputQuadratureSignal[i])) * cos(timingClockPhase);
+        phaseError = (-1+2*std::signbit(inputInPhaseSignal[i] * inputQuadratureSignal[i])) * cos(timingClockPhase);
         lower = pllParams.G2*phaseError + lower;
         loopFilt = pllParams.G1*phaseError + lower;
         dco = dco + loopFilt;

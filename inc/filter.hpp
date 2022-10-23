@@ -12,7 +12,3 @@ void filterFIR(const double *filterTaps, uint16_t numberOfTaps, const double *in
 void integrate(const double *inputSignal, uint16_t size, uint16_t numberOfTaps, double *outputSignal);
 
 void multiplyVector(double *signal, uint16_t length, double coef);
-
-inline bool signs(double x){
-    return x > 0;
-}
