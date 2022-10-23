@@ -111,7 +111,7 @@ TEST_CASE("Synchronization Test: ASM exists"){
         // Check if a spike exists in the correlation signal
         bool spikeExists = false;
         for (int i = 0; i < correlationLength; ++i) {
-            if (correlationSignal[i] > 8 * sigma){
+            if (correlationSignal[i] > 6 * sigma + mean){
                 /**
                  * The spike sample will be at sample: (bitPosition * samplesPerSymbol) / (samplesPerSymbol / 4)
                  * If ASM starts at bit position 32:
