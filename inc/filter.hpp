@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math.h>
+#include <cmath>
 #include <cstdint>
 
 // Filtering is supposed to be architecture-specific. When porting to STM32 make sure to make use of the existing HAL
