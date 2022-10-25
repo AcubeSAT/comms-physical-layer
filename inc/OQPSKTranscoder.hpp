@@ -1,34 +1,47 @@
 #pragma once
 
-#include "GMSKTranscoder.hpp"
-#include <FMTranscoder.hpp>
-#include <cmath>
-#include <cstdint>
+#include "etl/bitset.h"
 
-class OQPSKTranscoder {
-
-private:
-    double internalBufferInPhase[60000]; // TODO: Determine size (signal_length * maxSamplesPerSymbol)
-    double internalBufferQuadrature[60000];
+template <uint16_t inputLength> class OQPSKTranscoder {
+  public:
+    /**
+     * @param samplesPerSymbol sps is hardcoded to 4
+     */
+    static constexpr uint8_t samplesPerSymbol = 4;
+    /**
+     * @param samplingFrequency No. of samples / second
+     */
     uint32_t samplingFrequency;
+    /**
+     * @param symbolRate No. of symbols / second
+     */
     uint32_t symbolRate;
-    uint32_t samples;
-    uint8_t bitsPerSample = 2;
-    uint32_t samplesPerSymbol;
-    uint32_t maxFrequency;
-    uint32_t maxDeviation;
-    FMTranscoder fmTranscoder;
-    double internalBuffer[1 << 12]; // TODO: Determine size (signal_length * maxSamplesPerSymbol)
+    /**
+     * @param numberOfSymbols The number of symbols which will be generated.
+     * It equals input length divided by two, because OQPSK codes one symbol for 2 bits at the same time (4 positions).
+     */
+    static constexpr uint16_t numberOfSymbols = inputLength / 2;
 
-public:
-    OQPSKTranscoder(uint32_t samplingFrequency, uint32_t symbolRate):samplingFrequency(samplingFrequency), symbolRate(symbolRate),
-                                          fmTranscoder(FMTranscoder(samplingFrequency, symbolRate / 2, 0,
-                                                                     symbolRate / 4, 0, 0)) {
-        samplesPerSymbol = samplingFrequency/symbolRate; // samplesPerSymbol and samplesPerSymbol/2 must be integer values - throw error?
-        maxFrequency = symbolRate / 2;
-        maxDeviation = symbolRate / 4;
-    }
+    double internalBuffer[inputLength*samplesPerSymbol];
+    /**
+     * @param numOQPSKTaps number of taps is hardcoded to 23
+     */
+    static constexpr uint8_t numOQPSKTaps = 23;
+    /**
+     * @param oqpskTaps
+     */
+    double oqpskTaps[numOQPSKTaps] = {-0.0020520018879324198, -0.0003224409883841872, 0.002508002333343029, -0.00506692985072732, 0.005374290514737368,
+                          0.0015200789785012603, -0.007524007000029087, 0.021281106397509575, -0.03762003779411316, -0.05320276319980621, 0.2901403307914734,
+                          0.5699287056922913, 0.2901403307914734, -0.05320276319980621, -0.03762003779411316, 0.021281106397509575,
+                          -0.007524007000029087, 0.0015200789785012603, 0.005374290514737368, -0.00506692985072732, 0.002508002333343029,
+                          -0.0003224409883841872, -0.0020520018879324198};
 
-    void modulate(bool *signal, uint16_t signalLength, double *inPhaseSignal, double *quadratureSignal);
-
+    OQPSKTranscoder(uint32_t symbolRate): symbolRate(symbolRate), samplingFrequency(symbolRate * samplesPerSymbol){}
+    /**
+     * The modulating method
+     * @param input
+     * @param inPhaseSignal Serves as output for the in phase signal. Should be allocated before calling the method
+     * @param quadratureSignal Serves as output for the quadrature signal. Should be allocated before calling the method
+     */
+    void modulate(const etl::bitset<inputLength>& input, double *inPhaseSignal, double *quadratureSignal);
 };
