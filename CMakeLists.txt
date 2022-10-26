@@ -5,9 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include")
 include_directories(inc)
-
-add_subdirectory(lib/etl)
-
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 add_compile_options(-Wvla)
 
 add_library(common OBJECT
