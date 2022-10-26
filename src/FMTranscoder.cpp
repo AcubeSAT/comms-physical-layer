@@ -2,7 +2,7 @@
 #include "filter.hpp"
 #include <algorithm>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 void FMTranscoder::modulate(const double *signal, uint16_t signal_length, double *in_phase_signal,
                             double *quadrature_signal) {
