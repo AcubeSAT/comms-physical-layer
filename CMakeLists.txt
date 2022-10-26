@@ -8,7 +8,10 @@ include_directories(inc)
 
 add_subdirectory(lib/etl)
 
-add_compile_options(-Wvla)
+# No dynamic allocations in the stack
+add_compile_options(-Wvla -Walloca)
+# We do not use exceptions, nor runtime polymorphism
+add_compile_options(-fno-exceptions -fno-rtti)
 
 add_library(common OBJECT
         src/BCHDecoder.cpp
