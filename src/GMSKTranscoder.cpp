@@ -3,19 +3,18 @@
 #include <cstring>
 #include <iostream>
 
-template <int samplesPerSymbol>
-void GMSKTranscoder<samplesPerSymbol>::modulate(const bool *signal, uint16_t signalLength, double *inPhaseSignal,
-                              double *quadratureSignal) {
+template <uint8_t samplesPerSymbol, uint16_t inputLength>
+void GMSKTranscoder<samplesPerSymbol, inputLength>::modulate(const etl::bitset<inputLength>& input, double *inPhaseSignal, double *quadratureSignal) {
 
-    uint16_t samplesN = samplesPerSymbol * signalLength;
+    uint16_t samplesN = samplesPerSymbol * inputLength;
 
-    internalBufferQuadrature[0] = (signal[0]+1)%2;
-    for (uint16_t i = 0; i < signalLength - 1; i++){
-        internalBufferQuadrature[i+1] = (signal[i+1]+signal[i] + i+1)%2;
+    internalBufferQuadrature[0] = (input[0] + 1) % 2;
+    for (uint16_t i = 0; i < inputLength - 1; i++){
+        internalBufferQuadrature[i + 1] = (input[i + 1] + input[i] + i + 1) % 2;
     }
 
     // NRZ encoding
-    for (uint16_t i = 0; i < signalLength; i++) {
+    for (uint16_t i = 0; i < inputLength; i++) {
         // TODO: HAL implementation
         for (uint16_t j = 0; j < samplesPerSymbol; j++) {
             internalBufferInPhase[i * samplesPerSymbol + j] = -1 + 2 * (internalBufferQuadrature[i]);
@@ -32,9 +31,10 @@ void GMSKTranscoder<samplesPerSymbol>::modulate(const bool *signal, uint16_t sig
     fmTranscoder.modulate(internalBufferQuadrature, samplesN, inPhaseSignal, quadratureSignal);
 }
 
-template <int samplesPerSymbol>
-void GMSKTranscoder<samplesPerSymbol>::demodulate(double *inputInPhaseSignal, double *inputQuadratureSignal, uint16_t signalLength,
-                                bool *signal) {
+
+template <uint8_t samplesPerSymbol, uint16_t inputLength>
+void GMSKTranscoder<samplesPerSymbol, inputLength>::demodulate(double *inputInPhaseSignal, double *inputQuadratureSignal, uint16_t signalLength,
+                                                               etl::bitset<inputLength>& output) {
 
     uint16_t symbolsN = floor(signalLength / samplesPerSymbol);
     float frequency_deviation_component = 2 * M_PI * maxDeviation / samplingFrequency;
@@ -42,9 +42,8 @@ void GMSKTranscoder<samplesPerSymbol>::demodulate(double *inputInPhaseSignal, do
     int numtaps = 41;
 
     // Add Wiener Filter for equalisation (Convolution with the gaussian filter)
-    if(equalize){
+    if(this->equalize){
         filterFIR(delayedTaps, 6 * samplesPerSymbol, gmskModulationCoefficients, numtaps, convolvedFilters);
-
         filterFIR(convolvedFilters, numtaps, inputInPhaseSignal, signalLength, internalBufferInPhase);
         filterFIR(convolvedFilters, numtaps, inputQuadratureSignal, signalLength, internalBufferQuadrature);
     }
@@ -109,12 +108,18 @@ void GMSKTranscoder<samplesPerSymbol>::demodulate(double *inputInPhaseSignal, do
     }
 
     for (uint16_t i = 0; i < symbolsN/2; i++){
-        signal[2*i] = inputInPhaseSignal[i] > 0;
-        signal[2*i+1] = inputQuadratureSignal[i] > 0;
+        output.set(2 * i, inputInPhaseSignal[i] > 0);
+        output.set(2 * i + 1, inputQuadratureSignal[i] > 0);
     }
 
 }
 
-template class GMSKTranscoder<4>;
-template class GMSKTranscoder<6>;
-template class GMSKTranscoder<10>;
+
+// 100 * 60: input sizes used in gmskTest.cpp
+template class GMSKTranscoder<4, 100 * 60>;
+template class GMSKTranscoder<6, 100 * 60>;
+template class GMSKTranscoder<10, 100 * 60>;
+
+// 160: input size used in syncTest.cpp, 64: ASM length
+template class GMSKTranscoder<10, 160>;
+template class GMSKTranscoder<10, 64>;

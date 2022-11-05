@@ -4,15 +4,15 @@
 #include <iostream>
 #include <string>
 
-constexpr int PacketLength = 100;
-constexpr int NumPackets = 60;
-constexpr int MaxSNR = 20;
+constexpr uint16_t PacketLength = 100;
+constexpr uint16_t NumPackets = 60;
+constexpr uint8_t MaxSNR = 20;
 
 bool packet[PacketLength] = {1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0,
                                 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1};
 
-bool gmskIn[NumPackets * PacketLength] = {0};
-bool demodSignal[NumPackets * PacketLength] = {0};
+etl::bitset<NumPackets * PacketLength> gmskIn = etl::bitset<NumPackets * PacketLength>();
+etl::bitset<NumPackets * PacketLength> demodSignal = etl::bitset<NumPackets * PacketLength>();
 
 // BER generated from octave prototype
 double octaveBER[20] = {0.5, 0.1, 0.046109, 0.030406, 0.019704, 0.008702, 0.003401, 0.001100, 0.000500, 0.000400,
@@ -25,39 +25,39 @@ TEST_CASE("GMSK: SPS = 10") {
     std::fstream berFile;
     berFile.open("../test/iofiles/out_ber10.txt", std::ios::out);
     double ber[20];
-    const int sps = 10;
-    double gmsk_iout[sps * PacketLength * NumPackets] = {0};
-    double gmsk_qout[sps * PacketLength * NumPackets] = {0};
+    const uint8_t samplesPerSymbol = 10;
+    double gmsk_iout[samplesPerSymbol * PacketLength * NumPackets] = {0};
+    double gmsk_qout[samplesPerSymbol * PacketLength * NumPackets] = {0};
 
     for (int k = 0; k < MaxSNR; k++) {
         std::string test_name = "Mod/Demod, SNR = " + std::to_string(k) + " dB";
 
         SECTION(test_name, "[gmskModem]") {
             int sample_frequency = 48000;
-            int symbol_rate = sample_frequency / sps;
-            GMSKTranscoder<sps> gmsk_mod(sample_frequency, symbol_rate, false);
+            int symbol_rate = sample_frequency / samplesPerSymbol;
+            GMSKTranscoder<samplesPerSymbol, NumPackets * PacketLength> gmsk_mod(sample_frequency, symbol_rate, false);
 
             // Add NUM_PACKETS random packets to the input signal
             std::srand(std::time(nullptr));
             for (int i = 0; i < NumPackets; i++) {
                 for (int j = 0; j < PacketLength; j++) {
-                    gmskIn[PacketLength * i + j] = std::rand() % 2;
+                    gmskIn.set(PacketLength * i + j, std::rand() % 2);
                 }
             }
 
-            gmsk_mod.modulate(gmskIn, NumPackets * PacketLength, gmsk_iout, gmsk_qout);
+            gmsk_mod.modulate(gmskIn, gmsk_iout, gmsk_qout);
 
             // Writing I/Q data to a file for plotting
             std::fstream iqFile;
             iqFile.open("../test/iofiles/out_iqFileGMSK.txt", std::ios::out);
             if (iqFile.is_open()) {
-                for (int i = 0; i < sps * PacketLength * NumPackets; i++) {
+                for (int i = 0; i < samplesPerSymbol * PacketLength * NumPackets; i++) {
                     iqFile << gmsk_iout[i] << " " << gmsk_qout[i] << " ";
                 }
             }
 
             SECTION("I/Q on unit circle", "[unitCircleIQ]") {
-                for (int i = 0; i < sps * PacketLength * NumPackets; i++) {
+                for (int i = 0; i < samplesPerSymbol * PacketLength * NumPackets; i++) {
                     CHECK(std::abs(gmsk_qout[i] * gmsk_qout[i] + gmsk_iout[i] * gmsk_iout[i]) == Catch::Approx(1));
                 }
             }
@@ -65,7 +65,7 @@ TEST_CASE("GMSK: SPS = 10") {
             SECTION("Demodulation", "[demodulation]") {
                 // Phase Shift by pi/2 (I + jQ => -Q + jI)
                 double temp;
-                for (int i = 0; i < sps * PacketLength * NumPackets; i++) {
+                for (int i = 0; i < samplesPerSymbol * PacketLength * NumPackets; i++) {
                     std::swap(gmsk_qout[i], gmsk_iout[i]);
                     gmsk_iout[i] *= -1;
                 }
@@ -77,27 +77,26 @@ TEST_CASE("GMSK: SPS = 10") {
                 std::default_random_engine generator;
                 std::normal_distribution<double> dist(0, 1);
 
-                for (int i = 0; i < sps * NumPackets * PacketLength; i++) {
+                for (int i = 0; i < samplesPerSymbol * NumPackets * PacketLength; i++) {
                     gmsk_iout[i] += sqrt(variance/2)*dist(generator);
                     gmsk_qout[i] += sqrt(variance/2)*dist(generator);
                 }
 
                 // Demodulation
-                gmsk_mod.demodulate(gmsk_iout, gmsk_qout, sps * NumPackets * PacketLength, demodSignal);
+                gmsk_mod.demodulate(gmsk_iout, gmsk_qout, samplesPerSymbol * NumPackets * PacketLength, demodSignal);
 
                 // Search for Frame location and calculate BER for the optimal position
-                int minimumErrorCount = PacketLength * NumPackets;
-                int minimumBitCount = PacketLength * NumPackets;
-                int length = sizeof(demodSignal) / sizeof(*demodSignal);  // Length  of demod signal
+                uint16_t minimumErrorCount = PacketLength * NumPackets;
+                uint16_t minimumBitCount = PacketLength * NumPackets;
                 int shift;
                 for (int i = 0; i < 100; ++i) {
                     int errorCount = 0;
-                    for (int j = i; j < length; ++j) {
+                    for (int j = i; j < demodSignal.size(); ++j) {
                         errorCount += demodSignal[j] ^ gmskIn[j - i];
                     }
                     if (errorCount < minimumErrorCount) {
                         minimumErrorCount = errorCount;
-                        minimumBitCount = length;
+                        minimumBitCount = demodSignal.size();
                         std::cout << "Shift: " << i << " | Nerrs: " << errorCount << std::endl;
                         shift=i;
                     }
@@ -120,17 +119,17 @@ TEST_CASE("GMSK: SPS = 6") {
     std::fstream berFile;
     berFile.open("../test/iofiles/out_ber6.txt", std::ios::out);
     double ber[20];
-    const int sps = 6;
-    double gmsk_iout[sps * PacketLength * NumPackets] = {0};
-    double gmsk_qout[sps * PacketLength * NumPackets] = {0};
+    constexpr uint8_t samplesPerSymbol = 6;
+    double gmsk_iout[samplesPerSymbol * PacketLength * NumPackets] = {0};
+    double gmsk_qout[samplesPerSymbol * PacketLength * NumPackets] = {0};
 
     for (int k = 0; k < MaxSNR; k++) {
         std::string test_name = "Mod/Demod, SNR = " + std::to_string(k) + " dB";
 
         SECTION(test_name, "[gmskModem]") {
             int sample_frequency = 48000;
-            int symbol_rate = sample_frequency / sps;
-            GMSKTranscoder<sps> gmsk_mod(sample_frequency, symbol_rate, false);
+            int symbol_rate = sample_frequency / samplesPerSymbol;
+            GMSKTranscoder<samplesPerSymbol, NumPackets * PacketLength> gmsk_mod(sample_frequency, symbol_rate, false);
 
             // Add NUM_PACKETS random packets to the input signal
             std::srand(std::time(nullptr));
@@ -140,19 +139,19 @@ TEST_CASE("GMSK: SPS = 6") {
                 }
             }
 
-            gmsk_mod.modulate(gmskIn, NumPackets * PacketLength, gmsk_iout, gmsk_qout);
+            gmsk_mod.modulate(gmskIn, gmsk_iout, gmsk_qout);
 
             // Writing I/Q data to a file for plotting
             std::fstream iqFile;
             iqFile.open("../test/iofiles/out_iqFileGMSK.txt", std::ios::out);
             if (iqFile.is_open()) {
-                for (int i = 0; i < sps * PacketLength * NumPackets; i++) {
+                for (int i = 0; i < samplesPerSymbol * PacketLength * NumPackets; i++) {
                     iqFile << gmsk_iout[i] << " " << gmsk_qout[i] << " ";
                 }
             }
 
             SECTION("I/Q on unit circle", "[unitCircleIQ]") {
-                for (int i = 0; i < sps * PacketLength * NumPackets; i++) {
+                for (int i = 0; i < samplesPerSymbol * PacketLength * NumPackets; i++) {
                     CHECK(std::abs(gmsk_qout[i] * gmsk_qout[i] + gmsk_iout[i] * gmsk_iout[i]) == Catch::Approx(1));
                 }
             }
@@ -160,7 +159,7 @@ TEST_CASE("GMSK: SPS = 6") {
             SECTION("Demodulation", "[demodulation]") {
                 // Phase Shift by pi/2 (I + jQ => -Q + jI)
                 double temp;
-                for (int i = 0; i < sps * PacketLength * NumPackets; i++) {
+                for (int i = 0; i < samplesPerSymbol * PacketLength * NumPackets; i++) {
                     std::swap(gmsk_qout[i], gmsk_iout[i]);
                     gmsk_iout[i] *= -1;
                 }
@@ -172,27 +171,26 @@ TEST_CASE("GMSK: SPS = 6") {
                 std::default_random_engine generator;
                 std::normal_distribution<double> dist(0, 1);
 
-                for (int i = 0; i < sps * NumPackets * PacketLength; i++) {
+                for (int i = 0; i < samplesPerSymbol * NumPackets * PacketLength; i++) {
                     gmsk_iout[i] += sqrt(variance/2)*dist(generator);
                     gmsk_qout[i] += sqrt(variance/2)*dist(generator);
                 }
 
                 // Demodulation
-                gmsk_mod.demodulate(gmsk_iout, gmsk_qout, sps * NumPackets * PacketLength, demodSignal);
+                gmsk_mod.demodulate(gmsk_iout, gmsk_qout, samplesPerSymbol * NumPackets * PacketLength, demodSignal);
 
                 // Search for Frame location and calculate BER for the optimal position
-                int minimumErrorCount = PacketLength * NumPackets;
-                int minimumBitCount = PacketLength * NumPackets;
-                int length = sizeof(demodSignal) / sizeof(*demodSignal);  // Length  of demod signal
+                uint16_t minimumErrorCount = PacketLength * NumPackets;
+                uint16_t minimumBitCount = PacketLength * NumPackets;
                 int shift;
                 for (int i = 0; i < 100; ++i) {
                     int errorCount = 0;
-                    for (int j = i; j < length; ++j) {
+                    for (int j = i; j < gmskIn.size(); ++j) {
                         errorCount += demodSignal[j] ^ gmskIn[j - i];
                     }
                     if (errorCount < minimumErrorCount) {
                         minimumErrorCount = errorCount;
-                        minimumBitCount = length;
+                        minimumBitCount = gmskIn.size();
                         std::cout << "Shift: " << i << " | Nerrs: " << errorCount << std::endl;
                         shift=i;
                     }

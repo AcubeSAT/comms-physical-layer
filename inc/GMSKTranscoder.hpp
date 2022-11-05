@@ -3,6 +3,7 @@
 #include <FMTranscoder.hpp>
 #include "GMSKFilterTaps.hpp"
 #include <cmath>
+#include "etl/bitset.h"
 #include <iostream>
 
 struct PLLParameters{
@@ -14,12 +15,16 @@ struct PLLParameters{
 };
 
 
-template <int samplesPerSymbol> class GMSKTranscoder {
+template <uint8_t samplesPerSymbol, uint16_t inputLength> class GMSKTranscoder {
 private:
-    double internalBufferInPhase[60000]; // TODO: Determine size (signal_length * max_samplesPerSymbol)
-    double internalBufferQuadrature[60000];
-    double wienerTaps[3] = {-0.0859984, 1.0116342, -0.0859984};
-    double delayedTaps[6 * samplesPerSymbol];
+    double internalBufferInPhase[samplesPerSymbol * inputLength];
+    double internalBufferQuadrature[samplesPerSymbol * inputLength];
+    static constexpr uint8_t wienerTapNumber = 3;
+    static constexpr uint8_t wienerSymbolDelay = 2;
+
+    double wienerTaps[wienerTapNumber] = {-0.0859984, 1.0116342, -0.0859984};
+
+    double delayedTaps[wienerTapNumber * wienerSymbolDelay * samplesPerSymbol];
     bool equalize;
     double convolvedFilters[109]; //TODO: Length is the length of gmsk_mod and delayed taps added (Now 60 + 49)
     uint32_t samplingFrequency;
@@ -40,7 +45,7 @@ public:
     GMSKTranscoder(uint32_t sampleFrequency, uint32_t symbRate, bool equalize) :
             fmTranscoder(FMTranscoder(sampleFrequency, symbRate / 2, 0,
                                       symbRate / 4, 0, 0)),
-            symbolRate(symbRate), samplingFrequency(sampleFrequency) {
+            symbolRate(symbRate), samplingFrequency(sampleFrequency), equalize(equalize) {
 
         maxFrequency = symbolRate / 2;
         maxDeviation = symbolRate / 4;
@@ -49,7 +54,6 @@ public:
         std::fill(std::begin(delayedTaps), std::begin(delayedTaps) + 2*samplesPerSymbol, wienerTaps[0]);
         std::fill(std::begin(delayedTaps) + 2*samplesPerSymbol, std::begin(delayedTaps) + 4*samplesPerSymbol, wienerTaps[1]);
         std::fill(std::begin(delayedTaps) + 4*samplesPerSymbol, std::begin(delayedTaps) + 6*samplesPerSymbol, wienerTaps[2]);
-        this->equalize = equalize;
 
         double zeta = 0.707;
         double wn = (2.0*10*M_PI*symbolRate)/4800;
@@ -80,10 +84,10 @@ public:
     }
 
     // TODO: signal_length should be a pre-determined number
-    void modulate(const bool *signal, uint16_t signalLength, double *inPhaseSignal, double *quadratureSignal);
+    void modulate(const etl::bitset<inputLength>& input, double *inPhaseSignal, double *quadratureSignal);
 
     // Consider changing input IQ signal to const
     void
-    demodulate(double *inputInPhaseSignal, double *inputQuadratureSignal, uint16_t signalLength, bool *signal);
+    demodulate(double *inputInPhaseSignal, double *inputQuadratureSignal, uint16_t signalLength, etl::bitset<inputLength>& output);
 
 };

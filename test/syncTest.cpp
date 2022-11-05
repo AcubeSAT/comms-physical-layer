@@ -41,7 +41,7 @@ TEST_CASE("Synchronization Test: ASM exists"){
     constexpr uint16_t inputLength = asmLength + messageLength + tailLength + excessBits;
 
     std::srand(std::time(nullptr));
-    bool input[inputLength] = {0};
+    etl::bitset<inputLength> input = etl::bitset<inputLength>();
 
     double cltuInPhase[inputLength * samplesPerSymbol] = {0};
     double cltuQuadrature[inputLength * samplesPerSymbol] = {0};
@@ -49,6 +49,7 @@ TEST_CASE("Synchronization Test: ASM exists"){
     double correlationSignal[correlationLength] = {0};
 
     auto synchronizer = Synchronizer<samplesPerSymbol, inputLength>(sampleFrequency, symbolRate);
+    auto gmsk = GMSKTranscoder<samplesPerSymbol, inputLength>(sampleFrequency, symbolRate, false);
 
     std::fstream acqFile;
     acqFile.open("../test/iofiles/acq.txt", std::ios::out);
@@ -68,10 +69,8 @@ TEST_CASE("Synchronization Test: ASM exists"){
     }
     SECTION("ACQ Calculation"){
         // CLTU Packet
-        synchronizer.gmsk.modulate(input, inputLength,
-                                   cltuInPhase, cltuQuadrature);
-        synchronizer.computeCorrelation(cltuInPhase, cltuQuadrature,
-                                        inputLength * samplesPerSymbol);
+        gmsk.modulate(input, cltuInPhase, cltuQuadrature);
+        synchronizer.computeCorrelation(cltuInPhase, cltuQuadrature);
 
         // Calculate correlation signal from acqBuffer (Max sample from each row)
         for (int i = 0; i < (samplesPerSymbol * (inputLength - asmLength)) / (samplesPerSymbol / 4); ++i) {
@@ -141,7 +140,7 @@ TEST_CASE("Synchronization Test: Random Signal"){
     constexpr uint16_t inputLength = asmLength + messageLength + tailLength + excessBits;
 
     std::srand(std::time(nullptr));
-    bool input[inputLength] = {0};
+    etl::bitset<inputLength> input = etl::bitset<inputLength>();
 
     double cltuInPhase[inputLength * samplesPerSymbol] = {0};
     double cltuQuadrature[inputLength * samplesPerSymbol] = {0};
@@ -149,6 +148,7 @@ TEST_CASE("Synchronization Test: Random Signal"){
     double correlationSignal[correlationLength] = {0};
 
     auto synchronizer = Synchronizer<samplesPerSymbol, inputLength>(sampleFrequency, symbolRate);
+    auto gmsk = GMSKTranscoder<samplesPerSymbol, inputLength>(sampleFrequency, symbolRate, false);
 
     std::fstream acqFile;
     acqFile.open("../test/iofiles/acqRandom.txt", std::ios::out);
@@ -160,10 +160,8 @@ TEST_CASE("Synchronization Test: Random Signal"){
 
     SECTION("ACQ Calculation"){
         // CLTU Packet
-        synchronizer.gmsk.modulate(input, inputLength,
-                                   cltuInPhase, cltuQuadrature);
-        synchronizer.computeCorrelation(cltuInPhase, cltuQuadrature,
-                                        inputLength * samplesPerSymbol);
+        gmsk.modulate(input, cltuInPhase, cltuQuadrature);
+        synchronizer.computeCorrelation(cltuInPhase, cltuQuadrature);
 
         // Calculate correlation signal from acqBuffer (Max sample from each row)
         for (int i = 0; i < (samplesPerSymbol * (inputLength - asmLength)) / (samplesPerSymbol / 4); ++i) {
