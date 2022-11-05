@@ -28,10 +28,7 @@ public:
     /**
      * ASM test sequence to be detected by the algorithm
      */
-    constexpr static bool startSequence[asmLength] = {1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0,
-                                     1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1,
-                                     1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0,
-                                     0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1};
+    const etl::bitset<asmLength> startSequence = 0b1110110101001000100011101001110110110110010010000001001110110011;
 
     /**
      * Tail sequence of a CLTU
@@ -44,15 +41,15 @@ public:
 
     uint16_t sampleFrequency;
     uint16_t symbolRate;
-    GMSKTranscoder<samplesPerSymbol> gmsk;
+    GMSKTranscoder<samplesPerSymbol, asmLength> gmsk;
 
     /**
      * Calculates the I/Q of the GMSK modulated ASM
      */
     Synchronizer(int sampleFrequency, int symbolRate) : sampleFrequency(sampleFrequency), symbolRate(symbolRate),
-            gmsk(GMSKTranscoder<samplesPerSymbol>(sampleFrequency, symbolRate, false)){
+            gmsk(GMSKTranscoder<samplesPerSymbol, asmLength>(sampleFrequency, symbolRate, false)){
 
-        gmsk.modulate(startSequence, asmLength, inPhaseASMSamples, quadratureASMSamples);
+        gmsk.modulate(startSequence, inPhaseASMSamples, quadratureASMSamples);
     }
 
     /**
@@ -62,7 +59,7 @@ public:
      * @param quadratureSignal : Quadrature component of GMSK modulated CLTU
      * @param signalLength : Number of samples
      */
-    void computeCorrelation(double *inPhaseSignal, double *quadratureSignal, int signalLength);
+    void computeCorrelation(double *inPhaseSignal, double *quadratureSignal);
 
     double getAcqBuffer(uint16_t i, uint16_t j){
         return acqBuffer[i][j];

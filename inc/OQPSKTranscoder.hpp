@@ -22,7 +22,7 @@ template <uint16_t inputLength> class OQPSKTranscoder {
      */
     static constexpr uint16_t numberOfSymbols = inputLength / 2;
 
-    double internalBuffer[inputLength*samplesPerSymbol];
+    double internalBuffer[inputLength * samplesPerSymbol];
     /**
      * @param numOQPSKTaps number of taps is hardcoded to 23
      */

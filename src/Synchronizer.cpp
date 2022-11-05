@@ -2,7 +2,7 @@
 
 
 template <int samplesPerSymbol, int inputLength>
-void Synchronizer<samplesPerSymbol, inputLength>::computeCorrelation(double *inPhaseSignal, double *quadratureSignal, int signalLength) {
+void Synchronizer<samplesPerSymbol, inputLength>::computeCorrelation(double *inPhaseSignal, double *quadratureSignal) {
 
     const uint16_t step = samplesPerSymbol / 4;
 
@@ -35,8 +35,3 @@ void Synchronizer<samplesPerSymbol, inputLength>::computeCorrelation(double *inP
 template class Synchronizer<10, 64>;
 template class Synchronizer<10, 176>;
 template class Synchronizer<10, 160>;
-template class Synchronizer<6, 160>;
-template class Synchronizer<4, 160>;
-template class Synchronizer<10, 144>;
-template class Synchronizer<6, 144>;
-template class Synchronizer<6, 64>;
