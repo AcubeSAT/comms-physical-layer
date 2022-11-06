@@ -123,3 +123,8 @@ template class GMSKTranscoder<10, 100 * 60>;
 // 160: input size used in syncTest.cpp, 64: ASM length
 template class GMSKTranscoder<10, 160>;
 template class GMSKTranscoder<10, 64>;
+
+// Templates for Tx UHF Task (COMMS Software)
+template class GMSKTranscoder<6, 1024>;
+template class GMSKTranscoder<6, 2048>;
+template class GMSKTranscoder<6, 4096>;
