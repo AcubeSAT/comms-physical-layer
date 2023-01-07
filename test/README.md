@@ -75,3 +75,31 @@ In case an ASM codeword exists encoded in the received modulated signal, the alg
 When and ASM is not present, the correlation plot does not have any distinct spikes:
 
 ![Signal without ASM](./media/CorrelationNoASM.png "Correlation of a signal not containing an ASM")
+
+## Channel effects testing
+In ```channelTest.cpp``` is included a test to check the functionality of the methods in the ```Channel.cpp```. 
+More specifically it tests if the addition of white gaussian noise, the phase shifting and the frequency shifting are implemented correctly.
+
+An example is shown below with graphs that are produced with the ```channelTest.py```.
+
+### Original GMSK modulated signal
+![Signal GMSK](./media/GMSKsignal.png "")
+
+
+### Signal with white gaussian noise added 
+![Signal with WGN](./media/WGN.png "")
+
+
+### Phase shifted signal by PI
+![Signal PHASE SHIFTED](./media/PhaseShift.png "")
+
+
+### Frequency shifted signal by 1000 Hz
+![Signal FREQUENCY SHIFTED](./media/FreqShift.png "")
+
+
+
+
+
+
+

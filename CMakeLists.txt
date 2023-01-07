@@ -22,7 +22,7 @@ add_library(common OBJECT
         src/filter.cpp
         src/LDPCEncoder.cpp
         src/Synchronizer.cpp
-        )
+        src/Channel.cpp )
 
 file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
 
