@@ -30,17 +30,15 @@ void filterFIR(const double *filterTaps, uint16_t numberOfTaps,
 #endif
 }
 
-// TODO: Instead of O(nk) this can easily be simplified to O(n) by considering
-// the sliding window and at the time step
-//  t adding x(t) while subtracting x(t-k). See if there is a HAL implementation
+// See if there is a HAL implementation
 //  for this (ideally don't use convolve).
 void integrate(const double *inputSignal, uint16_t size, uint16_t numberOfTaps,
                double *outputSignal) {
-    for (uint16_t n = 0; n < size; n++) {
-        outputSignal[n] = 0;
-        for (uint16_t k = 0; k < fmin(n + 1, numberOfTaps); k++) {
-            outputSignal[n] += inputSignal[n - k];
-        }
+    outputSignal[0] = inputSignal[0]; 
+    for (uint16_t n = 1; n < size; n++) {
+        outputSignal[n] = outputSignal[n - 1] + inputSignal[n];  
+        if (n >= numberOfTaps)
+            outputSignal[n] -= outputSignal[n - numberOfTaps]; 
     }
 }
 
