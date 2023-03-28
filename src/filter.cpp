@@ -3,9 +3,11 @@
 // This is the dummy solution, other solutions may be
 // a. updating cmsis header files to >= 5.7 or
 // b. moving lines 133 - 149 of the header mentioned above out of the function they are currently in, making them global.
+#ifdef STM32
 extern "C" {
     #include "arm_math.h"
 }
+#endif
 
 void filterFIR(const double *filterTaps, uint16_t numberOfTaps,
                const double *inputSignal, uint16_t size, double *outputSignal) {
