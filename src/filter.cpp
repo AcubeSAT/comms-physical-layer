@@ -22,7 +22,7 @@ void filterFIR(const double *filterTaps, uint16_t numberOfTaps,
         }
     }
 #else
-    arm_fir_instance_f32 fir_inst;
+    arm_fir_instance_f32 firInst;
     // find max size and max numberOfTaps to make firState static
     float firState[size + numberOfTaps - 1];
     arm_fir_init_f32(&fir_inst, numberOfTaps, (float *)filterTaps, firState, size);
@@ -30,7 +30,7 @@ void filterFIR(const double *filterTaps, uint16_t numberOfTaps,
 #endif
 }
 
-// See if there is a HAL implementation
+// TODO: See if there is a HAL implementation
 //  for this (ideally don't use convolve).
 void integrate(const double *inputSignal, uint16_t size, uint16_t numberOfTaps,
                double *outputSignal) {
@@ -38,7 +38,7 @@ void integrate(const double *inputSignal, uint16_t size, uint16_t numberOfTaps,
     for (uint16_t n = 1; n < size; n++) {
         outputSignal[n] = outputSignal[n - 1] + inputSignal[n];  
         if (n >= numberOfTaps)
-            outputSignal[n] -= outputSignal[n - numberOfTaps]; 
+            outputSignal[n] -= inputSignal[n - numberOfTaps]; 
     }
 }
 
