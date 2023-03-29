@@ -25,8 +25,8 @@ void filterFIR(const double *filterTaps, uint16_t numberOfTaps,
     arm_fir_instance_f32 firInst;
     // find max size and max numberOfTaps to make firState static
     float firState[size + numberOfTaps - 1];
-    arm_fir_init_f32(&fir_inst, numberOfTaps, (float *)filterTaps, firState, size);
-    arm_fir_f32(&fir_inst, (float *)inputSignal, (float *)outputSignal, size);
+    arm_fir_init_f32(&firInst, numberOfTaps, (float *)filterTaps, firState, size);
+    arm_fir_f32(&firInst, (float *)inputSignal, (float *)outputSignal, size);
 #endif
 }
 
