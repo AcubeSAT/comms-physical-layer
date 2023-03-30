@@ -3,7 +3,7 @@
 
 
 template <uint16_t inputLength>
-void OQPSKTranscoder<inputLength>::modulate(const etl::bitset<inputLength>& input, double *inPhaseSignal, double *quadratureSignal) {
+void OQPSKTranscoder<inputLength>::modulate(const etl::bitset<inputLength>& input, float *inPhaseSignal, float *quadratureSignal) {
     // In-phase and quadrature are calculated separately in order to only use a single buffer
     // Calculate in-phase first
     for (uint32_t i = 0; i < inputLength; i += 2) {

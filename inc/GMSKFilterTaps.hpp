@@ -3,7 +3,7 @@
 /**
  * Gaussian Filter Taps for BTs = 0.25 and 4 samples per symbol
  */
-const double GMSKSPS4BTs25[] = {  // BTs = 0.25, SPS = 4
+const float GMSKSPS4BTs25[] = {  // BTs = 0.25, SPS = 4
         8.913363046541144e-21, 6.826244415584271e-19, 4.1850392455120133e-17,
         2.0539727348957947e-15, 8.069882110640914e-14, 2.5381493781728715e-12,
         6.390642875997443e-11, 1.2880992938946179e-09, 2.07841175381418e-08,
@@ -22,7 +22,7 @@ const double GMSKSPS4BTs25[] = {  // BTs = 0.25, SPS = 4
 /**
  * Gaussian Filter Taps for BTs = 0.25 and 6 samples per symbol
  */
-const double GMSKSPS6BTs25[] = {
+const float GMSKSPS6BTs25[] = {
         3.2343897005127076e-10, 2.224272543926986e-09, 1.3856078062701727e-08,
         7.818965030992331e-08, 3.9968224996300705e-07, 1.8507042796045425e-06,
         7.762754648865666e-06, 2.9495200578821823e-05, 0.00010151808965019882,
@@ -41,7 +41,7 @@ const double GMSKSPS6BTs25[] = {
 /**
  * Gaussian Filter Taps for BTs = 0.25 and 10 samples per symbol
  */
-const double GMSKSPS10BTs25[] = {  // BTs = 0.25, SPS = 10
+const float GMSKSPS10BTs25[] = {  // BTs = 0.25, SPS = 10
         6.0915601352462545e-05, 0.0001219525802298449, 0.00023561004491057247,
         0.0004392755508888513, 0.0007903521764092147, 0.00137228611856699,
         0.0022993709426373243, 0.003718037623912096, 0.00580174895003438,
@@ -60,7 +60,7 @@ const double GMSKSPS10BTs25[] = {  // BTs = 0.25, SPS = 10
 /**
  * Gaussian Filter Taps for BTs = 0.5 and 10 samples per symbol
  */
-const double GMSKSPS10BTs50[] = {   // Hardcoded BTs = 0.5, Rowetel
+const float GMSKSPS10BTs50[] = {   // Hardcoded BTs = 0.5, Rowetel
         6.455906007234699e-014, 1.037067381285011e-012, 1.444835156335346e-011,
         1.745786683011439e-010, 1.829471305298363e-009, 1.662729407135958e-008,
         1.310626978701910e-007, 8.959797186410516e-007, 5.312253663302771e-006,

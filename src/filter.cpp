@@ -9,8 +9,8 @@ extern "C" {
 }
 #endif
 
-void filterFIR(const double *filterTaps, uint16_t numberOfTaps,
-               const double *inputSignal, uint16_t size, double *outputSignal) {
+void filterFIR(const float *filterTaps, uint16_t numberOfTaps,
+               const float *inputSignal, uint16_t size, float *outputSignal) {
     //  Additionally, if the latter is the case, an additional parameter needs
     //  to be passed both here and in the initialization of the modems that
     //  defines which implementation is to be chosen
@@ -25,15 +25,15 @@ void filterFIR(const double *filterTaps, uint16_t numberOfTaps,
     arm_fir_instance_f32 firInst;
     // find max size and max numberOfTaps to make firState static
     float firState[size + numberOfTaps - 1];
-    arm_fir_init_f32(&firInst, numberOfTaps, (float *)filterTaps, firState, size);
-    arm_fir_f32(&firInst, (float *)inputSignal, (float *)outputSignal, size);
+    arm_fir_init_f32(&firInst, numberOfTaps, filterTaps, firState, size);
+    arm_fir_f32(&firInst, inputSignal, outputSignal, size);
 #endif
 }
 
 // TODO: See if there is a HAL implementation
 //  for this (ideally don't use convolve).
-void integrate(const double *inputSignal, uint16_t size, uint16_t numberOfTaps,
-               double *outputSignal) {
+void integrate(const float *inputSignal, uint16_t size, uint16_t numberOfTaps,
+               float *outputSignal) {
     outputSignal[0] = inputSignal[0]; 
     for (uint16_t n = 1; n < size; n++) {
         outputSignal[n] = outputSignal[n - 1] + inputSignal[n];  
@@ -43,7 +43,7 @@ void integrate(const double *inputSignal, uint16_t size, uint16_t numberOfTaps,
     }
 }
 
-void multiplyVector(double *signal, uint16_t length, double coef) {
+void multiplyVector(float *signal, uint16_t length, float coef) {
     // TODO: This is a placeholder bad implementation. Replace with HAL function
     // (interface may need to change slightly)
 #ifndef STM32
@@ -51,7 +51,7 @@ void multiplyVector(double *signal, uint16_t length, double coef) {
         signal[i] *= coef;
     }
 #else
-    arm_scale_f32((float *)signal, coef, (float *)signal, length);
+    arm_scale_f32(signal, coef, signal, length);
 #endif
 }
 

@@ -22,7 +22,7 @@ template <uint16_t inputLength> class OQPSKTranscoder {
      */
     static constexpr uint16_t numberOfSymbols = inputLength / 2;
 
-    double internalBuffer[inputLength * samplesPerSymbol];
+    float internalBuffer[inputLength * samplesPerSymbol];
     /**
      * @param numOQPSKTaps number of taps is hardcoded to 23
      */
@@ -30,7 +30,7 @@ template <uint16_t inputLength> class OQPSKTranscoder {
     /**
      * @param oqpskTaps
      */
-    double oqpskTaps[numOQPSKTaps] = {-0.0020520018879324198, -0.0003224409883841872, 0.002508002333343029, -0.00506692985072732, 0.005374290514737368,
+    float oqpskTaps[numOQPSKTaps] = {-0.0020520018879324198, -0.0003224409883841872, 0.002508002333343029, -0.00506692985072732, 0.005374290514737368,
                           0.0015200789785012603, -0.007524007000029087, 0.021281106397509575, -0.03762003779411316, -0.05320276319980621, 0.2901403307914734,
                           0.5699287056922913, 0.2901403307914734, -0.05320276319980621, -0.03762003779411316, 0.021281106397509575,
                           -0.007524007000029087, 0.0015200789785012603, 0.005374290514737368, -0.00506692985072732, 0.002508002333343029,
@@ -43,5 +43,5 @@ template <uint16_t inputLength> class OQPSKTranscoder {
      * @param inPhaseSignal Serves as output for the in phase signal. Should be allocated before calling the method
      * @param quadratureSignal Serves as output for the quadrature signal. Should be allocated before calling the method
      */
-    void modulate(const etl::bitset<inputLength>& input, double *inPhaseSignal, double *quadratureSignal);
+    void modulate(const etl::bitset<inputLength>& input, float *inPhaseSignal, float *quadratureSignal);
 };

@@ -26,8 +26,8 @@ TEST_CASE("GMSK: SPS = 10") {
     berFile.open("../test/iofiles/out_ber10.txt", std::ios::out);
     double ber[20];
     const uint8_t samplesPerSymbol = 10;
-    double gmsk_iout[samplesPerSymbol * PacketLength * NumPackets] = {0};
-    double gmsk_qout[samplesPerSymbol * PacketLength * NumPackets] = {0};
+    float gmsk_iout[samplesPerSymbol * PacketLength * NumPackets] = {0};
+    float gmsk_qout[samplesPerSymbol * PacketLength * NumPackets] = {0};
 
     for (int k = 0; k < MaxSNR; k++) {
         std::string test_name = "Mod/Demod, SNR = " + std::to_string(k) + " dB";
@@ -120,8 +120,8 @@ TEST_CASE("GMSK: SPS = 6") {
     berFile.open("../test/iofiles/out_ber6.txt", std::ios::out);
     double ber[20];
     constexpr uint8_t samplesPerSymbol = 6;
-    double gmsk_iout[samplesPerSymbol * PacketLength * NumPackets] = {0};
-    double gmsk_qout[samplesPerSymbol * PacketLength * NumPackets] = {0};
+    float gmsk_iout[samplesPerSymbol * PacketLength * NumPackets] = {0};
+    float gmsk_qout[samplesPerSymbol * PacketLength * NumPackets] = {0};
 
     for (int k = 0; k < MaxSNR; k++) {
         std::string test_name = "Mod/Demod, SNR = " + std::to_string(k) + " dB";

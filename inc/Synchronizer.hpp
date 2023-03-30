@@ -12,17 +12,17 @@ private:
     /**
      * In phase component of the GMSK modulated ASM
      */
-    double inPhaseASMSamples[asmLength * samplesPerSymbol] = {};
+    float inPhaseASMSamples[asmLength * samplesPerSymbol] = {};
 
     /**
      * Quadrature component of the GMSK modulated ASM
      */
-    double quadratureASMSamples[asmLength * samplesPerSymbol] = {};
+    float quadratureASMSamples[asmLength * samplesPerSymbol] = {};
 
     /**
      * Acquisition Buffer that contains the output of the correlation algorithm
      */
-    double acqBuffer[(samplesPerSymbol * (inputLength - asmLength)) / (samplesPerSymbol / 4)][MaxPowerOf2] = {};
+    float acqBuffer[(samplesPerSymbol * (inputLength - asmLength)) / (samplesPerSymbol / 4)][MaxPowerOf2] = {};
 
 public:
     /**
@@ -59,9 +59,9 @@ public:
      * @param quadratureSignal : Quadrature component of GMSK modulated CLTU
      * @param signalLength : Number of samples
      */
-    void computeCorrelation(double *inPhaseSignal, double *quadratureSignal);
+    void computeCorrelation(float *inPhaseSignal, float *quadratureSignal);
 
-    double getAcqBuffer(uint16_t i, uint16_t j){
+    float getAcqBuffer(uint16_t i, uint16_t j){
         return acqBuffer[i][j];
     };
 };

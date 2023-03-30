@@ -4,7 +4,7 @@
 #include <iostream>
 
 template <uint8_t samplesPerSymbol, uint16_t inputLength>
-void GMSKTranscoder<samplesPerSymbol, inputLength>::modulate(const etl::bitset<inputLength>& input, double *inPhaseSignal, double *quadratureSignal) {
+void GMSKTranscoder<samplesPerSymbol, inputLength>::modulate(const etl::bitset<inputLength>& input, float *inPhaseSignal, float *quadratureSignal) {
 
     uint16_t samplesN = samplesPerSymbol * inputLength;
 
@@ -33,12 +33,12 @@ void GMSKTranscoder<samplesPerSymbol, inputLength>::modulate(const etl::bitset<i
 
 
 template <uint8_t samplesPerSymbol, uint16_t inputLength>
-void GMSKTranscoder<samplesPerSymbol, inputLength>::demodulate(double *inputInPhaseSignal, double *inputQuadratureSignal, uint16_t signalLength,
+void GMSKTranscoder<samplesPerSymbol, inputLength>::demodulate(float *inputInPhaseSignal, float *inputQuadratureSignal, uint16_t signalLength,
                                                                etl::bitset<inputLength>& output) {
 
     uint16_t symbolsN = floor(signalLength / samplesPerSymbol);
     float frequency_deviation_component = 2 * M_PI * maxDeviation / samplingFrequency;
-    double rx_int[2 << 12] = {0};
+    float rx_int[2 << 12] = {0};
     int numtaps = 41;
 
     // Add Wiener Filter for equalisation (Convolution with the gaussian filter)
@@ -56,22 +56,22 @@ void GMSKTranscoder<samplesPerSymbol, inputLength>::demodulate(double *inputInPh
     integrate(internalBufferQuadrature, signalLength, 2 * samplesPerSymbol, inputQuadratureSignal);
 
     // Implement PLL
-    double dco = 0;
-    double lower = 0;
-    double loopFilt = 0;
-    double phaseError = 0;
-    double timingClockPhase = 0;
+    float dco = 0;
+    float lower = 0;
+    float loopFilt = 0;
+    float phaseError = 0;
+    float timingClockPhase = 0;
     uint16_t timingWindow = 10*samplesPerSymbol; // TODO: 200*samplesPerSymbol;
-    double timingAngle = 0;
-    double* timingAngleLog = internalBufferInPhase;
-    double* toff = internalBufferQuadrature;
+    float timingAngle = 0;
+    float* timingAngleLog = internalBufferInPhase;
+    float* toff = internalBufferQuadrature;
 
-    double temp;
+    float temp;
 
     for (uint16_t i; i < signalLength; i++){
         if (i > 1 && (i+1) % timingWindow == 0){
-            double iClockPhase = 0;
-            double qClockPhase = 0;
+            float iClockPhase = 0;
+            float qClockPhase = 0;
             for (uint16_t j = i - timingWindow + 1; j <= i; j++){
                 iClockPhase += fabs(inputInPhaseSignal[j]) * cos((j + 1) * 2 * M_PI * (symbolRate / 2.0) / samplingFrequency);
                 qClockPhase -= fabs(inputInPhaseSignal[j]) * sin((j + 1) * 2 * M_PI * (symbolRate / 2.0) / samplingFrequency);

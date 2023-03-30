@@ -10,8 +10,8 @@ TEST_CASE("OQPSK Modulation") {
     static constexpr uint32_t symbolRate = 12000;
     OQPSKTranscoder<packetLength*numOfPackets> oqpsk(symbolRate);
 
-    double inPhaseSignal[oqpsk.samplesPerSymbol*packetLength*numOfPackets] = {0};
-    double quadratureSignal[oqpsk.samplesPerSymbol*packetLength*numOfPackets] = {0};
+    float inPhaseSignal[oqpsk.samplesPerSymbol*packetLength*numOfPackets] = {0};
+    float quadratureSignal[oqpsk.samplesPerSymbol*packetLength*numOfPackets] = {0};
 
     SECTION("Repeated Packet") {
         // Add numOfPackets packets to the input signal

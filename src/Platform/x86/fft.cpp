@@ -5,7 +5,8 @@
 
 #include "fft.hpp"
 
-constexpr double PI = 3.141592653589793238460;
+// constexpr double PI = 3.141592653589793238460;
+constexpr float PI = 3.1415926;
 
 void fft(ComplexArray& x)
 {
@@ -28,7 +29,7 @@ void fft(ComplexArray& x)
     // combine
     for (size_t k = 0; k < N/2; ++k)
     {
-        Complex t = std::polar(1.0, -2 * PI * k / N) * odd[k];
+        Complex t = std::polar(static_cast<float>(1.0), -2 * PI * k / N) * odd[k];
         x[k    ] = even[k] + t;
         x[k+N/2] = even[k] - t;
     }

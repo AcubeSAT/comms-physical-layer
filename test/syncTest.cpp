@@ -43,8 +43,8 @@ TEST_CASE("Synchronization Test: ASM exists"){
     std::srand(std::time(nullptr));
     etl::bitset<inputLength> input = etl::bitset<inputLength>();
 
-    double cltuInPhase[inputLength * samplesPerSymbol] = {0};
-    double cltuQuadrature[inputLength * samplesPerSymbol] = {0};
+    float cltuInPhase[inputLength * samplesPerSymbol] = {0};
+    float cltuQuadrature[inputLength * samplesPerSymbol] = {0};
     const uint16_t correlationLength = (samplesPerSymbol * (inputLength - asmLength)) / (samplesPerSymbol / 4);
     double correlationSignal[correlationLength] = {0};
 
@@ -142,8 +142,8 @@ TEST_CASE("Synchronization Test: Random Signal"){
     std::srand(std::time(nullptr));
     etl::bitset<inputLength> input = etl::bitset<inputLength>();
 
-    double cltuInPhase[inputLength * samplesPerSymbol] = {0};
-    double cltuQuadrature[inputLength * samplesPerSymbol] = {0};
+    float cltuInPhase[inputLength * samplesPerSymbol] = {0};
+    float cltuQuadrature[inputLength * samplesPerSymbol] = {0};
     const uint16_t correlationLength = (samplesPerSymbol * (inputLength - asmLength)) / (samplesPerSymbol / 4);
     double correlationSignal[correlationLength] = {0};
 

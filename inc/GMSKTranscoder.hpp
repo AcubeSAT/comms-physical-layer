@@ -7,26 +7,26 @@
 #include <iostream>
 
 struct PLLParameters{
-    double dampingRatio;
-    double naturalFrequency;
-    double symbolTime;
-    double G1; // Gain of the upper branch of the loop filter
-    double G2; // Gain of the lower branch of the loop filter
+    float dampingRatio;
+    float naturalFrequency;
+    float symbolTime;
+    float G1; // Gain of the upper branch of the loop filter
+    float G2; // Gain of the lower branch of the loop filter
 };
 
 
 template <uint8_t samplesPerSymbol, uint16_t inputLength> class GMSKTranscoder {
 private:
-    double internalBufferInPhase[samplesPerSymbol * inputLength];
-    double internalBufferQuadrature[samplesPerSymbol * inputLength];
+    float internalBufferInPhase[samplesPerSymbol * inputLength];
+    float internalBufferQuadrature[samplesPerSymbol * inputLength];
     static constexpr uint8_t wienerTapNumber = 3;
     static constexpr uint8_t wienerSymbolDelay = 2;
 
-    double wienerTaps[wienerTapNumber] = {-0.0859984, 1.0116342, -0.0859984};
+    float wienerTaps[wienerTapNumber] = {-0.0859984, 1.0116342, -0.0859984};
 
-    double delayedTaps[wienerTapNumber * wienerSymbolDelay * samplesPerSymbol];
+    float delayedTaps[wienerTapNumber * wienerSymbolDelay * samplesPerSymbol];
     bool equalize;
-    double convolvedFilters[109]; //TODO: Length is the length of gmsk_mod and delayed taps added (Now 60 + 49)
+    float convolvedFilters[109]; //TODO: Length is the length of gmsk_mod and delayed taps added (Now 60 + 49)
     uint32_t samplingFrequency;
     uint32_t samplingRate;
     uint32_t maxFrequency;
@@ -34,7 +34,7 @@ private:
     uint32_t maxDeviation;
     FMTranscoder fmTranscoder;
     PLLParameters pllParams;
-    const double *gmskModulationCoefficients = nullptr;
+    const float *gmskModulationCoefficients = nullptr;
 
     /**
      * Enumeration of samples per symbol values
@@ -55,17 +55,17 @@ public:
         std::fill(std::begin(delayedTaps) + 2*samplesPerSymbol, std::begin(delayedTaps) + 4*samplesPerSymbol, wienerTaps[1]);
         std::fill(std::begin(delayedTaps) + 4*samplesPerSymbol, std::begin(delayedTaps) + 6*samplesPerSymbol, wienerTaps[2]);
 
-        double zeta = 0.707;
-        double wn = (2.0*10*M_PI*symbolRate)/4800;
-        double an = exp(-zeta*wn/samplingFrequency);
-        double g1 = 1 - an*an;
-        double g2 = 1 + an*an - 2*an* cos(wn*sqrt(1-zeta*zeta)/samplingFrequency);
+        float zeta = 0.707;
+        float wn = (2.0*10*M_PI*symbolRate)/4800;
+        float an = exp(-zeta*wn/samplingFrequency);
+        float g1 = 1 - an*an;
+        float g2 = 1 + an*an - 2*an* cos(wn*sqrt(1-zeta*zeta)/samplingFrequency);
 
         pllParams = {zeta,
                                     wn,
-                                    1.0/samplingFrequency,
-                                    g1*M_PI/2,
-                                    g2*M_PI/2
+                                    static_cast<float>(1.0)/samplingFrequency,
+                                    static_cast<float>(g1*M_PI/2),
+                                    static_cast<float>(g2*M_PI/2)
                                     };
 
         switch (samplesPerSymbol) {
@@ -84,10 +84,10 @@ public:
     }
 
     // TODO: signal_length should be a pre-determined number
-    void modulate(const etl::bitset<inputLength>& input, double *inPhaseSignal, double *quadratureSignal);
+    void modulate(const etl::bitset<inputLength>& input, float *inPhaseSignal, float *quadratureSignal);
 
     // Consider changing input IQ signal to const
     void
-    demodulate(double *inputInPhaseSignal, double *inputQuadratureSignal, uint16_t signalLength, etl::bitset<inputLength>& output);
+    demodulate(float *inputInPhaseSignal, float *inputQuadratureSignal, uint16_t signalLength, etl::bitset<inputLength>& output);
 
 };

@@ -4,12 +4,12 @@
 #include <iostream>
 #include <cmath>
 
-void FMTranscoder::modulate(const double *signal, uint16_t signal_length, double *in_phase_signal,
-                            double *quadrature_signal) {
+void FMTranscoder::modulate(const float *signal, uint16_t signal_length, float *in_phase_signal,
+                            float *quadrature_signal) {
 
     // Central component should be 0 for baseband
-    double central_component = 2 * M_PI * basebandFrequency / samplingFrequency;
-    double frequency_deviation_component = 2 * M_PI * maxDeviation / samplingFrequency;
+    float central_component = 2 * M_PI * basebandFrequency / samplingFrequency;
+    float frequency_deviation_component = 2 * M_PI * maxDeviation / samplingFrequency;
 
     // Check if pre-emphasis is applied to the signal
     if (predeEmphasis) {
@@ -18,12 +18,12 @@ void FMTranscoder::modulate(const double *signal, uint16_t signal_length, double
         // TODO: Replace this with HAL function
 
         // Normalization
-        double max_el = *(std::max_element(in_phase_signal, in_phase_signal + signal_length));
+        float max_el = *(std::max_element(in_phase_signal, in_phase_signal + signal_length));
         multiplyVector(in_phase_signal, signal_length, 1.0 / max_el);
     }
 
-    double phase = 0;
-    double step;
+    float phase = 0;
+    float step;
     for (uint16_t i = 0; i < signal_length; i++) {
         // TODO: More efficient way
         // The conditional is here because in the case of pre-emphasis, in_phase_signal is used as a temporary

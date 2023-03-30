@@ -2,7 +2,7 @@
 
 
 template <int samplesPerSymbol, int inputLength>
-void Synchronizer<samplesPerSymbol, inputLength>::computeCorrelation(double *inPhaseSignal, double *quadratureSignal) {
+void Synchronizer<samplesPerSymbol, inputLength>::computeCorrelation(float *inPhaseSignal, float *quadratureSignal) {
 
     const uint16_t step = samplesPerSymbol / 4;
 

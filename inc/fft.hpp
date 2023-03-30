@@ -6,7 +6,7 @@
 
 constexpr uint16_t MaxFFTVectorLength = 10000;
 
-typedef std::complex<double> Complex;
+typedef std::complex<float> Complex;
 typedef etl::vector<Complex, MaxFFTVectorLength> ComplexArray;
 
 /**
