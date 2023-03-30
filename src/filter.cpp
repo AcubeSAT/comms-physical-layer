@@ -37,8 +37,9 @@ void integrate(const double *inputSignal, uint16_t size, uint16_t numberOfTaps,
     outputSignal[0] = inputSignal[0]; 
     for (uint16_t n = 1; n < size; n++) {
         outputSignal[n] = outputSignal[n - 1] + inputSignal[n];  
-        if (n >= numberOfTaps)
+        if (n >= numberOfTaps) {
             outputSignal[n] -= inputSignal[n - numberOfTaps]; 
+        }
     }
 }
 
