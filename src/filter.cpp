@@ -9,6 +9,8 @@ extern "C" {
 }
 #endif
 
+static float firState[13000]; // buffer size: size + numberOfTaps - 1; current value should be changed accordingly
+
 void filterFIR(const float *filterTaps, uint16_t numberOfTaps,
                const float *inputSignal, uint16_t size, float *outputSignal) {
     //  Additionally, if the latter is the case, an additional parameter needs
@@ -23,10 +25,8 @@ void filterFIR(const float *filterTaps, uint16_t numberOfTaps,
     }
 #else
     arm_fir_instance_f32 firInst;
-    // find max size and max numberOfTaps to make firState static
-    static float firState[13000];
-//    float firState[size + numberOfTaps - 1];
-    arm_fir_init_f32(&firInst, numberOfTaps, filterTaps, firState, size);
+    float* currFirState = &firState[0];
+    arm_fir_init_f32(&firInst, numberOfTaps, filterTaps, currFirState, size);
     arm_fir_f32(&firInst, inputSignal, outputSignal, size);
 #endif
 }
