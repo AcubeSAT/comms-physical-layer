@@ -3,13 +3,14 @@
 
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 int main(void) {
     freopen("../test/iofiles/gmsk_input_2048.txt", "r", stdin); 
     freopen("../test/iofiles/gmsk_float_x86_output.txt", "w", stdout); 
 
-    const int length = 2048;
-    const int sps = 6;
+    const uint16_t length = 2048;
+    const uint8_t sps = 6;
     float inPhaseOut[sps * length] = {0};
     float quadratureOut[sps * length] = {0};
 
@@ -18,8 +19,9 @@ int main(void) {
 
     etl::bitset<length> inputSignal;
     for (int i = 0; i < length; i++) {
-        inputSignal.set(i, input[i] == 1); 
+        inputSignal.set(i, input[i] == '1');
     }
+
 
     GMSKTranscoder<sps, length> gmskTrans(48000, 8000, false);
     gmskTrans.modulate(inputSignal, inPhaseOut, quadratureOut);
