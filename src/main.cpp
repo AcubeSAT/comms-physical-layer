@@ -7,7 +7,7 @@
 #include <cstdint>
 
 int main(void) {
-    std::ifstream file("../test/iofiles/gmsk_input_2048.txt");
+    std::ifstream file("../test/iofiles/gmsk_input.txt");
     std::ofstream iqFile("../test/iofiles/gmsk_float_x86_output.txt"); 
 
     if (!file.is_open()) {
