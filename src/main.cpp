@@ -12,10 +12,12 @@ int main(void) {
 
     if (!file.is_open()) {
         std::cout << "Cannot open input" << std::endl; 
+        return -1; 
     }
 
     if (!iqFile.is_open()) {
         std::cout << "Cannot open output" << std::endl; 
+        return -1; 
     }
 
     const uint16_t length = 2048;
@@ -57,5 +59,7 @@ int main(void) {
     }
 
     printf("%d %d\n", optimalErrors, shift);
+    file.close(); 
+    iqFile.close(); 
     return 0;
 }
