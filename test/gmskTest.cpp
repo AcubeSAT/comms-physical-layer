@@ -18,8 +18,9 @@ etl::bitset<NumPackets * PacketLength> demodSignal = etl::bitset<NumPackets * Pa
 double octaveBER[20] = {0.5, 0.1, 0.046109, 0.030406, 0.019704, 0.008702, 0.003401, 0.001100, 0.000500, 0.000400,
                         0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166, 0.000166,
                         0.000166};
-double testBER[20] = {0.401833 , 0.0943333, 0.073, 0.0571667, 0.0426667, 0.0326667, 0.0223333, 0.0148333, 0.00933333, 0.00566667,
+double testBER10[20] = {0.401833 , 0.0943333, 0.073, 0.0571667, 0.0426667, 0.0326667, 0.0223333, 0.0148333, 0.00933333, 0.00566667,
                       0.0045, 0.0025, 0.00183333, 0.0005, 0.000166667, 0.000166667, 0.000166667, 0.000166667, 0.000166667, 0.000166667};
+double testBER6[20] = {0.4475, 0.0853333, 0.0678333, 0.0505, 0.0368333, 0.0248333, 0.0181667, 0.0126667, 0.00916667, 0.006, 0.00266667, 0.00116667, 0.001, 0.000333333, 0.000166667, 0.000166667, 0.000166667, 0.000166667, 0.000166667, 0.000166667};
 
 TEST_CASE("GMSK: SPS = 10") {
     std::fstream berFile;
@@ -105,7 +106,7 @@ TEST_CASE("GMSK: SPS = 10") {
 
                 ber[k] = minimumErrorCount / static_cast<float>(minimumBitCount);
                 const double ErrorCoef = 10;
-                CHECK(ber[k] < ErrorCoef * testBER[k]);
+                CHECK(ber[k] < ErrorCoef * testBER10[k]);
                 std::cout << "Bit Errors: " << minimumErrorCount << "| BER: " << ber[k] << std::endl;
             }
         }
@@ -199,7 +200,7 @@ TEST_CASE("GMSK: SPS = 6") {
 
                 ber[k] = minimumErrorCount / static_cast<float>(minimumBitCount);
                 const double ErrorCoef = 10;
-                CHECK(ber[k] < ErrorCoef * testBER[k]);
+                CHECK(ber[k] < ErrorCoef * testBER6[k]);
                 std::cout << "Bit Errors: " << minimumErrorCount << "| BER: " << ber[k] << std::endl;
             }
         }
