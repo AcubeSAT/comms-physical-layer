@@ -69,7 +69,7 @@ clang-analyzer:
       - ./scan-build-html-report
 
 doxygen:
-  image: spacedot/doxygen:1.9.2-awesomecss-1.6.0
+  image: spacedot/doxygen:1.9.4-4-awesomecss-1.6.0
   stage: analyze
   script:
     - cd $CI_PROJECT_DIR
